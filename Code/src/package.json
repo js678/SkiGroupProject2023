@@ -1,16 +1,4 @@
 {
-  "version": "1.0.0",
-  "description": "ski project",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/js678/SkiGroupProject2023.git"
-  },
-  "author": "Andrew Lan, Conrad Barron, Jack Savio, Luke Gosnell, Parker Allen, Xan Gardner",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/js678/SkiGroupProject2023/issues"
-  },
-
   "name": "project-3308",
   "main": "index.js",
   "dependencies": {
@@ -33,7 +21,6 @@
     "start": "node index.js",
     "dev": "nodemon server.js",
     "test": "mocha",
-    "testandrun": "npm run prestart && npm run test",
-  "homepage": "https://github.com/js678/SkiGroupProject2023#readme"
-}
+    "testandrun": "npm run prestart && npm run test"
+  }
 }
