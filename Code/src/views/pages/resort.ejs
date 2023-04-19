@@ -5,7 +5,12 @@
         <title>Resort</title>
         <div id="left_side" style="float: left;">
             <div style="margin-bottom: 80px;">
-                <h1>Resort Name</h1>
+                <% var name = 'Resort Name'; %>
+                <% var country = 'Country'; %>
+                <% var region = 'Region'; %>
+                <% var namePrint = '<h1>' + name + ', ' + country + ', ' + region + '</h1>'; %>
+                <%- namePrint %>    
+                
             </div>
             <div>
                 <div>
@@ -39,7 +44,12 @@
         </div>
         <div id="right_side" style="float:right;">
             <div style="margin-bottom: 30px;">
-                <p>Learn more <a>here</a></p> <!-- Link to resort website here -->
+
+                <% var link = 'http://localhost:3000/resort'; %>
+                <% var learnPrint  = '<p>Learn more <a href="' + link +'"> here</a></p>'; %>
+                <%- learnPrint %>
+
+                <!-- Link to resort website here -->
             </div>
 
             <div style="margin-bottom: 30px;">
@@ -52,12 +62,20 @@
 
             <div>
                 <h3>Ski Lift Status</h3>
-                <p>Lift 1</p>
-                <p>Lift 2</p>
-                <p>Lift 3</p>
-                <p>Lift 4</p>
-                <p>Lift 5</p>
-                <p>Lift 6</p>
+
+                <% var liftPrint = ''; %>
+                <% var liftName = ''; %>
+                <% var liftStatus = 'closed'; %>
+                <% var lifts = ['Lift 1', 'Lift 2', 'Lift 3', 'Lift 4', 'Lift 5', 'Lift 6']; %>
+
+                <% lifts.forEach(lift => { %>
+                <%    var i = 0;
+                    liftPrint += '<p>' + lift + ': ' + liftStatus + '</p>';
+                    i += 1;
+                }); %>
+
+                <%- liftPrint %>
+
             </div>
 
         </div>
