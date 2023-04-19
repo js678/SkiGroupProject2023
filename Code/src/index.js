@@ -59,19 +59,94 @@ app.use(
 );
 
 const user = {
-    
-    username: undefined,
-    password: undefined,
-    
-  };
+  user_id: 1,
+  username: undefined,
+  password: undefined,
+  email: undefined,
+};
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
-
+app.get('/', (req, res) => {
+  res.redirect('/profile');
+});
 // TODO - Include your API routes here
 app.get('/welcome', (req, res) => {
-    res.json({status: 'success', message: 'Welcome!'});
-  });
+  res.json({ status: 'success', message: 'Welcome!' });
+});
+app.get('/profile', (req, res) => {
+  const query = "select * from users where user_id = $1;";
+
+  db.any(query, [user.user_id])
+    .then((user_data) => {
+      const query = `select * from past_trips 
+                       left join user_to_trips
+                       on past_trips.trip_id = user_to_trips.trip_id
+                       where user_to_trips.user_id = $1;`;
+      db.any(query, [user.user_id])
+        .then((trip_data) => {
+          const query = `select * from products 
+                            left join user_to_products
+                            on products.product_id = user_to_products.product_id
+                            where user_to_products.user_id = $1;`;
+          db.any(query, [user.user_id])
+            .then((item_data) => {
+              res.render("pages/profile", {
+                user_data,
+                trip_data,
+                item_data,
+                message: `Successfully got results`,
+              });
+            })
+            .catch((err) => {
+              res.render("pages/profile", {
+                user_data: [],
+                trip_data: [],
+                item_data: [],
+                error: true,
+                message: err.message,
+              });
+            });
+        })
+        .catch((err) => {
+          res.render("pages/profile", {
+            user_data: [],
+            trip_data: [],
+            item_data: [],
+            error: true,
+            message: err.message,
+          });
+        });
+    })
+    .catch((err) => {
+      res.render("pages/profile", {
+        user_data: [],
+        trip_data: [],
+        item_data: [],
+        error: true,
+        message: err.message,
+      });
+    });
+});
+
+app.post('/update-profile', (req, res) => {
+  const username = req.body.username;
+  const email = req.body.email;
+  const query = `update users 
+                   set username = $1,email = $2 
+                   where user_id = $3 returning * ;`;
+  if (username != null & email != null) {
+    db.any(query, [username, email, user.user_id])
+      .then((data) => {
+        user.username = username;
+        user.email = email;
+        res.redirect('/profile');
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
+  }
+});
 
 app.get('/login', (req, res) => {
   res.render('pages/login')
@@ -132,7 +207,7 @@ app.get('/home', (req,res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/login");
-  
+
 });
 app.get("/trips", (req, res)=>{
   res.render("pages/trips");
