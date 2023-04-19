@@ -1,0 +1,26 @@
+<%- include ('../partials/header') %>
+<%- include ('../partials/navbar') %>
+
+
+<main>
+    <div style="background-color: cadetblue;">
+     <div class="container" style="margin-top: 30px; margin-bottom: 30px;">
+       <h1 align="center">Register </h1>
+       <form style="text-align: center; margin-bottom: 20px;" action="/register" method="POST" align="center">
+    
+       <label for="username">Userame:</label>
+       <input type="text" id="username" name="username" />
+    
+       <label for="password">Password:</label>
+       <input type="password" id="password" name="password" />
+    
+        
+       <input type="submit" value="Register" />
+       </form>
+       <h3 align="center"> Already have an account? <a href="../pages/login.ejs">Login</a></h3>
+     </div>
+     </div>
+    </main>
+
+
+<%- include ('../partials/footer') %>
