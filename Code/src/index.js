@@ -1,3 +1,4 @@
+
 // *****************************************************
 // <!-- Section 1 : Import Dependencies -->
 // *****************************************************
@@ -72,35 +73,50 @@ app.get('/welcome', (req, res) => {
     res.json({status: 'success', message: 'Welcome!'});
   });
 
+app.get('/login', (req, res) => {
+  res.render('pages/login')
+});
+
+app.get('/register', (req, res) => {
+  res.render('pages/register')
+});
+
 // Login submission
-app.post("/login", (req, res) => {
-    const password = req.body.password;
-    const username = req.body.username;
-    const query = "select * from users where users.username = $1";
-    const values = [username];
-  
-    // get the student_id based on the emailid
-    db.one(query, values)
-      .then((data) => {
-        // const match = await bcrypt.compare(req.body.password, data.password);
-        if (false)
-        {
-            res.send({message: "Invalid Input"});
-        }
-        else
-        {
-            user.username = req.body.username;
-            user.password = req.body.password;
-            req.session.user = user;
-            req.session.save();
-            res.send({message: "Success"})
-        }
-        
-      })
-      .catch((err) => {
-        console.log(err);
-        // res.redirect("/login");
-      });
+app.post('/login', async (req,res) => {
+  // check if password from request matches with password in DB
+  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
+
+  db.tx(async (t) => {
+    return await t.one(
+      userQuery
+    );
+  })
+  .then(async (user) => {
+    const match = await bcrypt.compare(req.body.password, user.password);
+    //save user details in session like in lab 8
+    if (!match) {
+      res.send({message: "Invalid input"});
+    } else {
+      // req.session.user = user;
+      // req.session.save();
+      // res.redirect('/discover')
+      // Authentication Middleware.
+      //const auth = (req, res, next) => {
+        // if (!req.session.user) {
+        //   // Default to login page.
+        //   //return res.redirect('/login');
+        // }
+        res.send({message: "Success"});
+        next();
+      };
+
+      // Authentication Required
+      app.use(auth);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+    // res.redirect('/register');
   });
 
 
@@ -109,8 +125,8 @@ app.post("/login", (req, res) => {
 
 // Authentication Required
 
-app.get('/discover', (req, res) => {
-  res.render('pages/home',{})
+app.get('/home', (req,res) => {
+  res.render('pages/home');
 });
 
 app.get("/logout", (req, res) => {
@@ -118,17 +134,15 @@ app.get("/logout", (req, res) => {
   res.render("pages/login");
   
 });
-app.get("/trips", (req, res) => {
+app.get("/trips", (req, res)=>{
   res.render("pages/trips");
 })
-app.post("/trips", async (req, res)=>{
-  res.redirect('/resort')
+app.post("/login", async (req, res) => {
+  res.redirect("/resort");
 })
+
 // Make axios resort view call to see specifics of the ski resort
 app.get("/resort", (req, res) => {
-
-
-
 
   // const resortName = req.body.slug;
 
@@ -162,7 +176,6 @@ app.post("/resort/add", async (req, res) => {
   const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
 
 });
-
 
 
 // *****************************************************
