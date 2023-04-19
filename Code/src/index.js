@@ -125,8 +125,8 @@ app.post('/login', async (req,res) => {
 
 // Authentication Required
 
-app.get('/discover', (req, res) => {
-  res.render('pages/home',{})
+app.get('/home', (req,res) => {
+  res.render('pages/home');
 });
 
 app.get("/logout", (req, res) => {
