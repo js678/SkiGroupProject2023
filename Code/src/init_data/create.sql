@@ -16,3 +16,17 @@ CREATE TABLE past_trips(
     location VARCHAR(50) NOT NULL,
     duration INTEGER NOT NULL
 );
+
+CREATE TABLE user_to_products(
+    user_id SMALLINT,
+    product_id SMALLINT
+);
+
+CREATE TABLE products(
+    product_id SERIAL PRIMARY KEY,
+    product_type VARCHAR(50),
+    price FLOAT,
+    brand VARCHAR(50),
+    name VARCHAR(50),
+    image VARCHAR(300)
+);
