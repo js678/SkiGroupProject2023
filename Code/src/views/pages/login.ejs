@@ -1,0 +1,33 @@
+<%- include ('../partials/header') %>
+<%- include ('../partials/navbar') %>
+
+
+<main>
+    <div class="container" style="margin-top: 30px; margin-bottom: 30px; background-color: cadetblue;">
+        
+        <div style="background-color: cadetblue;">
+        <div>
+            <h3 align="center">Login </h1>
+            <p>Sign in with your username and password</p>
+        </div>
+        
+        <form style="text-align: center; margin-bottom: 20px;" action="/login" method="POST" align="center">
+   
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Enter username"/>
+   
+        <br><br>
+   
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Enter password"/>
+       
+        <input type="submit" value="Login" />
+        </form>
+        <h3>Don't have an account? <a href="../pages/register.ejs">Register</a></h3>
+   
+       </div>
+    </div>
+   </main>
+
+
+<%- include ('../partials/footer') %>
