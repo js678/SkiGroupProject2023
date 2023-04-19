@@ -122,7 +122,12 @@ app.get("/logout", (req, res) => {
 app.get("/resort", (req, res) => {
   res.render("pages/resort");
 })
-
+app.get("/trips", (req, res) => {
+  res.render("pages/trips");
+})
+app.post("/trips", async (req, res)=>{
+  res.redirect('/resort')
+})
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
