@@ -8,7 +8,7 @@ const pgp = require('pg-promise')(); // To connect to the Postgres DB from the n
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 //const bcrypt = require('bcrypt'); //  To hash passwords
-//const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
+const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -118,16 +118,53 @@ app.get("/logout", (req, res) => {
   res.render("pages/login");
   
 });
-
-app.get("/resort", (req, res) => {
-  res.render("pages/resort");
-})
 app.get("/trips", (req, res) => {
   res.render("pages/trips");
 })
 app.post("/trips", async (req, res)=>{
   res.redirect('/resort')
 })
+// Make axios resort view call to see specifics of the ski resort
+app.get("/resort", (req, res) => {
+
+
+
+
+  // const resortName = req.body.slug;
+
+  // const resortName = 'buttermilk';
+
+  // const options = {
+  //   method: 'GET',
+  //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
+  //   headers: {
+  //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
+  //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
+  //   }
+  // };
+
+  // axios.request(options).then(function (response) {
+  //   // console.log(response.data);
+    res.render("pages/resort");//, {
+  //     response
+  //   });
+  // }).catch(function (error) {
+  //   console.error(error);
+  //   res.render("pages/trips");
+  // });
+
+});
+
+// Adds the trip to the past trips table
+app.post("/resort/add", async (req, res) => {
+  // Need to finish writing this API
+  const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
+  const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
+
+});
+
+
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
