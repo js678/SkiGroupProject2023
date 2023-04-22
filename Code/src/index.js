@@ -59,19 +59,94 @@ app.use(
 );
 
 const user = {
-    
-    username: undefined,
-    password: undefined,
-    
-  };
+  user_id: 1,
+  username: undefined,
+  password: undefined,
+  email: undefined,
+};
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
-
+app.get('/', (req, res) => {
+  res.redirect('/profile');
+});
 // TODO - Include your API routes here
 app.get('/welcome', (req, res) => {
-    res.json({status: 'success', message: 'Welcome!'});
-  });
+  res.json({ status: 'success', message: 'Welcome!' });
+});
+app.get('/profile', (req, res) => {
+  const query = "select * from users where user_id = $1;";
+
+  db.any(query, [user.user_id])
+    .then((user_data) => {
+      const query = `select * from past_trips 
+                       left join user_to_trips
+                       on past_trips.trip_id = user_to_trips.trip_id
+                       where user_to_trips.user_id = $1;`;
+      db.any(query, [user.user_id])
+        .then((trip_data) => {
+          const query = `select * from products 
+                            left join user_to_products
+                            on products.product_id = user_to_products.product_id
+                            where user_to_products.user_id = $1;`;
+          db.any(query, [user.user_id])
+            .then((item_data) => {
+              res.render("pages/profile", {
+                user_data,
+                trip_data,
+                item_data,
+                message: `Successfully got results`,
+              });
+            })
+            .catch((err) => {
+              res.render("pages/profile", {
+                user_data: [],
+                trip_data: [],
+                item_data: [],
+                error: true,
+                message: err.message,
+              });
+            });
+        })
+        .catch((err) => {
+          res.render("pages/profile", {
+            user_data: [],
+            trip_data: [],
+            item_data: [],
+            error: true,
+            message: err.message,
+          });
+        });
+    })
+    .catch((err) => {
+      res.render("pages/profile", {
+        user_data: [],
+        trip_data: [],
+        item_data: [],
+        error: true,
+        message: err.message,
+      });
+    });
+});
+
+app.post('/update-profile', (req, res) => {
+  const username = req.body.username;
+  const email = req.body.email;
+  const query = `update users 
+                   set username = $1,email = $2 
+                   where user_id = $3 returning * ;`;
+  if (username != null & email != null) {
+    db.any(query, [username, email, user.user_id])
+      .then((data) => {
+        user.username = username;
+        user.email = email;
+        res.redirect('/profile');
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
+  }
+});
 
 app.get('/login', (req, res) => {
   res.render('pages/login')
@@ -82,42 +157,42 @@ app.get('/register', (req, res) => {
 });
 
 // Login submission
-app.post('/login', async (req,res) => {
-  // check if password from request matches with password in DB
-  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
+// app.post('/login', async (req,res) => {
+//   // check if password from request matches with password in DB
+//   const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
 
-  db.tx(async (t) => {
-    return await t.one(
-      userQuery
-    );
-  })
-  .then(async (user) => {
-    const match = await bcrypt.compare(req.body.password, user.password);
-    //save user details in session like in lab 8
-    if (!match) {
-      res.send({message: "Invalid input"});
-    } else {
-      // req.session.user = user;
-      // req.session.save();
-      // res.redirect('/discover')
-      // Authentication Middleware.
-      //const auth = (req, res, next) => {
-        // if (!req.session.user) {
-        //   // Default to login page.
-        //   //return res.redirect('/login');
-        // }
-        res.send({message: "Success"});
-        next();
-      };
+//   db.tx(async (t) => {
+//     return await t.one(
+//       userQuery
+//     );
+//   })
+//   .then(async (user) => {
+//     const match = await bcrypt.compare(req.body.password, user.password);
+//     //save user details in session like in lab 8
+//     if (!match) {
+//       res.send({message: "Invalid input"});
+//     } else {
+//       // req.session.user = user;
+//       // req.session.save();
+//       // res.redirect('/discover')
+//       // Authentication Middleware.
+//       //const auth = (req, res, next) => {
+//         // if (!req.session.user) {
+//         //   // Default to login page.
+//         //   //return res.redirect('/login');
+//         // }
+//         res.send({message: "Success"});
+//         next();
+//       };
 
-      // Authentication Required
-      app.use(auth);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-    // res.redirect('/register');
-  });
+//       // Authentication Required
+//       app.use(auth);
+//     });
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//     // res.redirect('/register');
+//   });
 
 
 // Authentication Middleware.
@@ -132,7 +207,7 @@ app.get('/home', (req,res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/login");
-  
+
 });
 app.get("/trips", (req, res)=>{
   res.render("pages/trips");
@@ -178,6 +253,17 @@ app.post("/resort/add", async (req, res) => {
 });
 
 
+
+app.get('/search', function(req, res) {
+  const query = req.query.query; // Get the search query from the URL query string
+  db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
+    .then(function(data) {
+      res.render('pages/search', { results: data }); // Render the search template with the search results
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************

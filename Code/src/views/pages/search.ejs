@@ -1,17 +1,45 @@
 <%- include ('../partials/header') %>
-<main>
+<!DOCTYPE html>
+<html>
   <head>
-    <title>Search Results</title>
+    <title>Search</title>
   </head>
   <body>
-    <!-- <h1>Search Results</h1>
-    <% if (results.length > 0) { %>
-      <ul>
-        showing result...
-      </ul>
-    <% } else { %>
-      no result....
-    <% } %> -->
+    <h1>Search</h1>
+    <form action="/search" method="GET">
+      <label for="search-input">Search:</label>
+      <input type="text" id="search-input" name="query">
+      <button type="submit">Search</button>
+    </form>
+
+    <% if (results && results.length > 0) { %>
+      <h2>Results</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Product Type</th>
+            <th>Price</th>
+            <th>Brand</th>
+            <th>Name</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% results.forEach(function(results) { %>
+          <tr>
+            <td><%= results.product_type %></td>
+            <td><%= results.price %></td>
+            <td><%= results.brand %></td>
+            <td><%= results.name %></td>
+            <td><img src="<%= results.image %>" /></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
   </body>
-</main>
+</html>
+
+
+
 <%- include ('../partials/footer') %>
