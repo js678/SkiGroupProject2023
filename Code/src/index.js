@@ -119,7 +119,14 @@ app.get("/logout", (req, res) => {
   
 });
 app.get("/trips", (req, res) => {
-  res.render("pages/trips");
+  const query = " SELECT * FROM trips";
+  db.any(query)
+  .then((trips)=>{
+    res.render("pages/trips",{
+    trips,
+   });
+  }
+  )
 })
 app.post("/trips", async (req, res)=>{
   res.redirect('/resort')
