@@ -9,7 +9,7 @@ const pgp = require('pg-promise')(); // To connect to the Postgres DB from the n
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 //const bcrypt = require('bcrypt'); //  To hash passwords
-const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
+// const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -219,37 +219,79 @@ app.post("/login", async (req, res) => {
 // Make axios resort view call to see specifics of the ski resort
 app.get("/resort", (req, res) => {
 
-  // const resortName = req.body.slug;
+  const resortName = req.query.trip_name;
+  const tripAddition = req.query.added;
+  var message = "";
+
+  console.log(resortName);
 
   // const resortName = 'buttermilk';
 
-  // const options = {
-  //   method: 'GET',
-  //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
-  //   headers: {
-  //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
-  //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
-  //   }
-  // };
-
-  // axios.request(options).then(function (response) {
-  //   // console.log(response.data);
-    res.render("pages/resort");//, {
-  //     response
-  //   });
-  // }).catch(function (error) {
-  //   console.error(error);
-  //   res.render("pages/trips");
-  // });
+    if(tripAddition=="success")
+    {
+      message = "Trip added!";
+    }
+    else if(tripAddition=="failed")
+    {
+      message = "There was a problem adding your trip, please try again";
+    }
+    res.render("pages/resort", {
+      message: message,
+    });
 
 });
 
 // Adds the trip to the past trips table
 app.post("/resort/add", async (req, res) => {
   // Need to finish writing this API
-  const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
-  const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
+  duration = req.body.duration;
+  trip_name = req.body.trip_name;
+  link = req.body.trip_link;
 
+  const queryPastTrips = `INSERT INTO past_trips(link, location, duration) VALUES ($1, $2, $3) returning trip_id;`;
+  const queryUserToTrips = `INSERT INTO user_to_trips(user_id, trip_id) VALUES ($1, $2) returning *;`;
+
+  // Inserts into past trips table
+  db.any(queryPastTrips, [link, trip_name, duration])
+  .then(function (data) {
+    // console.log(data[0]["trip_id"]);
+
+    const trip_id = data[0]["trip_id"];
+
+    // Find user in user's table
+    db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
+    .then( function(data) {
+
+      const user_id = data[0]["user_id"];
+
+      // Connects past trips to the user's account
+      db.any(queryUserToTrips, [user_id, trip_id])
+      .then( function(data) {
+
+        // // Re-renders the page 
+        // db.any(`SELECT * FROM trips WHERE trip_name = ${trip_name};`)
+        // .then( function(data) {
+          res.redirect(`/resort?trip_name=${trip_name}&added=success`);
+        // })
+        // .catch(function (err){
+          // console.log(err);
+        //   res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+        // });
+      })
+      .catch(function (err){
+        console.log(err);
+        res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+      });
+    })
+      .catch(function (err){
+        console.log(err);
+        res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+      });
+    })
+  .catch(function (err){
+    console.log(err);
+    res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+  });
 });
 
 

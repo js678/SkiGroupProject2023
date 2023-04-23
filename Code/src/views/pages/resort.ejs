@@ -78,10 +78,27 @@
 
             <!-- Input for trip duration and submit button for adding a trip -->
             <div style="margin-bottom: 30px;">
-                <form>
-                    <label>Trip Duration: &nbsp;</label>
-                    <input placeholder="1,2,3 ... Days" type="text" size="10px;">
-                    <button type="button" class="btn btn-primary">Add Trip</button>
+              <h3>Want to go on a trip?</h3>
+              <!-- Displays message for adding resorts -->
+              <% if (locals.message) { %>
+                <div
+                  class="alert alert-<%- locals.error ? 'danger' : 'success' %>"
+                  role="alert"
+                  style="margin-top: 10px;"
+                >
+                  <%= message %>
+                </div>
+                <% } %>
+                <form action="/resort/add" method="POST">
+                  <div>
+                    <input type="text" id="trip_name" size="2px;" name="trip_name" value="hello" readonly class="collapse">
+                    <input type="text" id="trip_link" size="2px" name="trip_link" value="link" readonly class="collapse">
+                  </div>
+                  <div>
+                    <label class="form-label">Trip Duration: &nbsp;</label>
+                    <input required placeholder="1,2,3 ... Days" type="text" size="10px;" id="duration" name="duration">
+                    <button type="submit" class="btn btn-primary">Add Trip</button>
+                  </div>
                 </form>
             </div>
 
