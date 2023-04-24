@@ -216,11 +216,14 @@ app.post("/login", async (req, res) => {
   res.redirect("/resort");
 })
 
+
+
 // Make axios resort view call to see specifics of the ski resort
 app.get("/resort", (req, res) => {
 
   const resortName = req.query.trip_name;
   const tripAddition = req.query.added;
+  const resortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
   var message = "";
 
   console.log(resortName);
@@ -235,8 +238,21 @@ app.get("/resort", (req, res) => {
     {
       message = "There was a problem adding your trip, please try again";
     }
-    res.render("pages/resort", {
-      message: message,
+    // res.render("pages/resort", {
+    //   message: message,
+    // });
+
+    db.any(resortQuery, [resortName])
+    .then(function(data){
+      res.render("pages/resort", {
+        status: 201,
+        message: message,
+        data: data,
+      });
+    })
+    .catch(function(err){
+      console.log(err);
+      res.redirect("/trips");
     });
 
 });
@@ -268,7 +284,7 @@ app.post("/resort/add", async (req, res) => {
       db.any(queryUserToTrips, [user_id, trip_id])
       .then( function(data) {
 
-        // // Re-renders the page 
+        // Re-renders the page 
         // db.any(`SELECT * FROM trips WHERE trip_name = ${trip_name};`)
         // .then( function(data) {
           res.redirect(`/resort?trip_name=${trip_name}&added=success`);

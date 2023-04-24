@@ -28,7 +28,7 @@ CREATE TABLE trips(
  lifts SMALLINT,
  runs SMALLINT,
  lat DECIMAL,
- lon DECIMAL,
+ lon DECIMAL
 );
 
 CREATE TABLE user_to_products(

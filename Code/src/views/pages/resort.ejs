@@ -29,9 +29,16 @@
 
 <!-- Need a different header because of the google maps api -->
 
+
+
 <body>
 <main>
+
+  <!-- include ('../partials/navbar') -->
+
     <div class="container" style="margin-top: 30px; margin-bottom: 30px;">
+
+        <% console.log(data); %>
 
         <title>Resort</title>
 
@@ -45,9 +52,9 @@
                 <!-- var country = response.data.data.country; -->
                 <!-- var region = response.data.data.region; -->
 
-                <% var name = 'Resort Name'; %>
-                <% var country = 'Country'; %>
-                <% var region = 'Region'; %>
+                <% var name = data[0]["trip_name"]; %>
+                <% var country = data[0]["country"]; %>
+                <% var region = data[0]["state_"]; %>
 
                 <% var namePrint = '<h1>' + name + ', ' + country + ', ' + region + '</h1>'; %>
                 <%- namePrint %>    
@@ -69,8 +76,8 @@
         <!-- Link to resort website -->
         <div id="right_side" style="float:right; background-color: transparent;">
             <div style="margin-bottom: 30px;">
-
-                <!-- var link = response.data.data.href; -->
+                <h3>Visit the website</h3>
+                <!-- var link = data[0]["link"]; -->
                 <% var link = 'http://localhost:3000/resort'; %>
                 <% var learnPrint  = '<p>Learn more <a href="' + link +'"> here</a></p>'; %>
                 <%- learnPrint %>
@@ -91,8 +98,13 @@
                 <% } %>
                 <form action="/resort/add" method="POST">
                   <div>
-                    <input type="text" id="trip_name" size="2px;" name="trip_name" value="hello" readonly class="collapse">
-                    <input type="text" id="trip_link" size="2px" name="trip_link" value="link" readonly class="collapse">
+                    <% var passData = '';
+                      passData += '<input type="text" id="trip_name" size="2px;" name="trip_name" value=' + name + ' readonly class="collapse">';
+                      passData += '<input type="text" id="trip_link" size="2px" name="trip_link" value=' + link + 'readonly class="collapse">';
+                    %>
+                    <%- passData %>
+                    <!-- <input type="text" id="trip_name" size="2px;" name="trip_name" value="hello" readonly class="collapse"> -->
+                    <!-- <input type="text" id="trip_link" size="2px" name="trip_link" value="link" readonly class="collapse"> -->
                   </div>
                   <div>
                     <label class="form-label">Trip Duration: &nbsp;</label>
@@ -104,16 +116,10 @@
 
             <!-- List of ski lifts and their statuses -->
             <div>
-                <h3>Ski Lift Status</h3>
+                <h3>Ski Lifts</h3>
 
                 <% var liftPrint = ''; %>
-                <% var liftName = ''; %>
-                <% var liftStatus = 'closed'; %>
-                <% var lifts = ['Lift 1', 'Lift 2', 'Lift 3', 'Lift 4', 'Lift 5', 'Lift 6']; %>
-
-                <% lifts.forEach(lift => { %>
-                <%  liftPrint += '<p>' + lift + ': ' + liftStatus + '</p>';
-                }); %>
+                <%  liftPrint += '<p>Number of Lifts: ' + data[0]["lifts"] + '</p>'; %>
 
                 <%- liftPrint %>
 
@@ -129,13 +135,22 @@
 <!-- console.log(latitude); -->
 <!-- console.log(longitude); -->
 
+<div>
+  <% var latitude = data[0]["lat"];
+     var longitude = data[0]["lon"];
+     var latPrint = '<input id="latit" readonly class="collapse" value=' + latitude + '>';
+     var lonPrint = '<input id="longt" readonly class="collapse" value=' + longitude + '>' %>
+  <%- latPrint %>
+  <%- lonPrint %>
+</div>
+
 
 <!-- Google maps api call -->
 <div id="map"></div>
 <script>
   var map;
   function initMap() {
-    const latLong = {lat: 40.0040, lng: -105.2670};
+    const latLong = {lat: parseFloat(document.getElementById("latit").value), lng: parseFloat(document.getElementById("longt").value)};
     map = new google.maps.Map(document.getElementById('map'), {
       center: latLong,
       zoom: 8
