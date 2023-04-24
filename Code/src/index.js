@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 // *****************************************************
 // <!-- Section 1 : Import Dependencies -->
 // *****************************************************
@@ -11,11 +7,7 @@ const app = express();
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
-<<<<<<< Updated upstream
-//const bcrypt = require('bcrypt'); //  To hash passwords
-=======
 const bcrypt = require('bcrypt'); //  To hash passwords
->>>>>>> Stashed changes
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
 
 // *****************************************************
@@ -49,12 +41,8 @@ db.connect()
 
 app.set('view engine', 'ejs'); // set the view engine to EJS
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-<<<<<<< Updated upstream
-
-=======
 const path = require('path')
 app.use(express.static(path.join(__dirname, "/resources/js")))
->>>>>>> Stashed changes
 // initialize session variables
 app.use(
   session({
@@ -76,7 +64,6 @@ const user = {
   password: undefined,
   email: undefined,
 };
-<<<<<<< Updated upstream
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
@@ -155,13 +142,6 @@ app.post('/purchase', (req, res) => {
       });
   }
 });
-=======
-
-
-app.get('/', (req, res) => {
-  res.redirect('/profile');
-});
->>>>>>> Stashed changes
 
 app.get('/profile', (req, res) => {
   const query = "select * from users where user_id = $1;";
@@ -169,7 +149,6 @@ app.get('/profile', (req, res) => {
   db.any(query, [user.user_id])
     .then((user_data) => {
       const query = `select * from past_trips 
-<<<<<<< Updated upstream
                        left join user_to_trips
                        on past_trips.trip_id = user_to_trips.trip_id
                        where user_to_trips.user_id = $1;`;
@@ -197,27 +176,12 @@ app.get('/profile', (req, res) => {
                 message: err.message,
               });
             });
-=======
-                     left join user_to_trips
-                     on past_trips.trip_id = user_to_trips.trip_id
-                     where user_to_trips.user_id = $1;`;
-      db.any(query, [user.user_id])
-        .then((trip_data) => {
-          res.render("pages/profile", {
-            user_data,
-            trip_data,
-            message: `Successfully got results`,
-          });
->>>>>>> Stashed changes
         })
         .catch((err) => {
           res.render("pages/profile", {
             user_data: [],
             trip_data: [],
-<<<<<<< Updated upstream
             item_data: [],
-=======
->>>>>>> Stashed changes
             error: true,
             message: err.message,
           });
@@ -227,10 +191,7 @@ app.get('/profile', (req, res) => {
       res.render("pages/profile", {
         user_data: [],
         trip_data: [],
-<<<<<<< Updated upstream
         item_data: [],
-=======
->>>>>>> Stashed changes
         error: true,
         message: err.message,
       });
@@ -241,7 +202,6 @@ app.post('/update-profile', (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
   const query = `update users 
-<<<<<<< Updated upstream
                    set username = $1,email = $2 
                    where user_id = $3 returning * ;`;
   if (username != null & email != null) {
@@ -368,67 +328,6 @@ app.get('/search', function(req, res) {
       console.log(error);
     });
 });
-=======
-                 set username = $1,email = $2 
-                 where user_id = $3 returning * ;`;
-  if(username != null & email != null) {
-  db.any(query, [username, email, user.user_id])
-    .then((data) => {
-      user.username = username;
-      user.email = email;
-      res.redirect('/profile');
-    })
-    .catch((err) => {
-      return console.log(err);
-    });
-  }
-});
-
-
-
-// *****************************************************
-// <!-- Section 4 : API Routes -->
-// *****************************************************
-
-// TODO - Include your API routes here
-app.get('/welcome', (req, res) => {
-    res.json({status: 'success', message: 'Welcome!'});
-  });
-
-// // Login submission
-app.post("/login", (req, res) => {
-    const password = req.body.password;
-    const username = req.body.username;
-    const query = "select * from users where users.username = $1";
-    const values = [username];
-
-    // get the student_id based on the emailid
-    db.one(query, values)
-      .then(async (data) => {
-        const hash = await bcrypt.hash(req.body.password, 10);
-        console.log(hash);
-        const match = await bcrypt.compare(req.body.password, data.password);
-        if (!match)
-        {
-            res.send({message: "Invalid Input"});
-        }
-        else
-        {
-            user.username = req.body.username;
-            user.password = req.body.password;
-            req.session.user = user;
-            req.session.save();
-            res.send({message: "Success"})
-        }
-
-      })
-      .catch((err) => {
-        console.log(err);
-        // res.redirect("/login");
-      });
-  });
-
->>>>>>> Stashed changes
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
