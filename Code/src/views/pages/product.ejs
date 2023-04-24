@@ -12,26 +12,27 @@
 		<button type="submit">Search</button>
 	</form>
 	<table>
+        <thead>
 		<tr>
-			<th>Name</th>
-			<th>Brand</th>
-			<th>Type</th>
-			<th>Price</th>
-			<th>Image</th>
-			<th></th>
-		</tr>
+            <th>Product Type</th>
+            <th>Price</th>
+            <th>Brand</th>
+            <th>Name</th>
+            <th>Image</th>
+          </tr>
+        </thead>
 		<% products.forEach(function(product) { %>
 			<tr>
-				<td><%= product.name %></td>
-				<td><%= product.brand %></td>
 				<td><%= product.product_type %></td>
-				<td>$<%= product.price.toFixed(2) %></td>
-				<td><img src="<%= product.image %>" alt="<%= product.name %>"></td>
-				<td><form action="/add-to-cart" method="post">
-						<input type="hidden" name="product_id" value="<%= product.product_id %>">
-						<button type="submit">Add to Cart</button>
-					</form>
-				</td>
+                <td><%= product.price %></td>
+                <td><%= product.brand %></td>
+                <td><%= product.name %></td>
+                <td><img src="<%= product.image %>" /></td>
+                <td><form action="/add-to-cart" method="post">
+                <input type="hidden" name="product_id" value="<%= product.product_id %>">
+                <button type="submit">Add to Cart</button>
+                </form>
+                <td>
 			</tr>
 		<% }); %>
 	</table>
