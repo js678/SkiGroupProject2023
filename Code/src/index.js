@@ -1,4 +1,3 @@
-
 // *****************************************************
 // <!-- Section 1 : Import Dependencies -->
 // *****************************************************
@@ -8,8 +7,8 @@ const app = express();
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
-//const bcrypt = require('bcrypt'); //  To hash passwords
-// const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
+const bcrypt = require('bcrypt'); //  To hash passwords
+const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -42,7 +41,8 @@ db.connect()
 
 app.set('view engine', 'ejs'); // set the view engine to EJS
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-
+const path = require('path')
+app.use(express.static(path.join(__dirname, "/resources/js")))
 // initialize session variables
 app.use(
   session({
@@ -71,9 +71,78 @@ app.get('/', (req, res) => {
   res.redirect('/profile');
 });
 // TODO - Include your API routes here
-app.get('/welcome', (req, res) => {
-  res.json({ status: 'success', message: 'Welcome!' });
+// app.get('/welcome', (req, res) => {
+//   res.json({ status: 'success', message: 'Welcome!' });
+// });
+
+app.get('/cart', (req, res) => {
+  const query = `select * from products
+                left join cart_items
+                on products.product_id = cart_items.product_id
+                where products.product_id = cart_items.product_id;`;
+  db.any(query)
+    .then((cart_data) => {
+      res.render("pages/cart", {
+        cart_data,
+        message: `Successfully got results`,
+      });
+    })
+    .catch((err) => {
+      res.render("pages/cart", {
+        cart_data: [],
+        error: true,
+        message: err.message,
+      });
+    });
 });
+
+app.post('/purchase', (req, res) => {
+  const name = req.body.item_name;
+  const button = req.body.button;
+  if(button == "add"){
+    query = `select * from products
+              where products.name = $1;`;
+    db.any(query, [name])
+      .then((item_id) => {
+        query = `INSERT INTO user_to_products(user_id, product_id) VALUES ($1,$2);`;
+        db.any(query, [user.user_id, item_id[0].product_id])
+        .then((data) => {
+          query = `DELETE FROM cart_items WHERE cart_items.product_id = $1;`;
+          db.any(query, [item_id[0].product_id])
+          .then((data1) => {
+            res.redirect('/cart');
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }else {
+    query = `select * from products
+              where products.name = $1;`;
+    db.any(query, [name])
+      .then((item_id) => {
+        query = `DELETE FROM cart_items WHERE cart_items.product_id = $1;`;
+        db.any(query, [item_id[0].product_id])
+        .then((data1) => {
+          res.redirect('/cart');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+});
+
 app.get('/profile', (req, res) => {
   const query = "select * from users where user_id = $1;";
 
@@ -194,11 +263,6 @@ app.get('/register', (req, res) => {
 //     // res.redirect('/register');
 //   });
 
-
-// Authentication Middleware.
-
-
-// Authentication Required
 
 app.get('/home', (req,res) => {
   res.render('pages/home');

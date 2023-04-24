@@ -44,3 +44,7 @@ CREATE TABLE products(
     name VARCHAR(50),
     image VARCHAR(300)
 );
+
+CREATE TABLE cart_items(
+    product_id SMALLINT
+);
