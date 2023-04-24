@@ -68,12 +68,81 @@ const user = {
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 app.get('/', (req, res) => {
-  res.redirect('/profile');
+  res.redirect('/cart');
 });
 // TODO - Include your API routes here
-app.get('/welcome', (req, res) => {
-  res.json({ status: 'success', message: 'Welcome!' });
+// app.get('/welcome', (req, res) => {
+//   res.json({ status: 'success', message: 'Welcome!' });
+// });
+
+app.get('/cart', (req, res) => {
+  const query = `select * from products
+                left join cart_items
+                on products.product_id = cart_items.product_id
+                where products.product_id = cart_items.product_id;`;
+  db.any(query)
+    .then((cart_data) => {
+      res.render("pages/cart", {
+        cart_data,
+        message: `Successfully got results`,
+      });
+    })
+    .catch((err) => {
+      res.render("pages/cart", {
+        cart_data: [],
+        error: true,
+        message: err.message,
+      });
+    });
 });
+
+app.post('/purchase', (req, res) => {
+  const name = req.body.item_name;
+  const button = req.body.button;
+  if(button == "add"){
+    query = `select * from products
+              where products.name = $1;`;
+    db.any(query, [name])
+      .then((item_id) => {
+        query = `INSERT INTO user_to_products(user_id, product_id) VALUES ($1,$2);`;
+        db.any(query, [user.user_id, item_id[0].product_id])
+        .then((data) => {
+          query = `DELETE FROM cart_items WHERE cart_items.product_id = $1;`;
+          db.any(query, [item_id[0].product_id])
+          .then((data1) => {
+            res.redirect('/cart');
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }else {
+    query = `select * from products
+              where products.name = $1;`;
+    db.any(query, [name])
+      .then((item_id) => {
+        query = `DELETE FROM cart_items WHERE cart_items.product_id = $1;`;
+        db.any(query, [item_id[0].product_id])
+        .then((data1) => {
+          res.redirect('/cart');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+});
+
 app.get('/profile', (req, res) => {
   const query = "select * from users where user_id = $1;";
 
@@ -148,51 +217,51 @@ app.post('/update-profile', (req, res) => {
   }
 });
 
-app.get('/login', (req, res) => {
-  res.render('pages/login')
-});
+// app.get('/login', (req, res) => {
+//   res.render('pages/login')
+// });
 
-app.get('/register', (req, res) => {
-  res.render('pages/register')
-});
+// app.get('/register', (req, res) => {
+//   res.render('pages/register')
+// });
 
 // Login submission
-app.post('/login', async (req,res) => {
-  // check if password from request matches with password in DB
-  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
+// app.post('/login', async (req,res) => {
+//   // check if password from request matches with password in DB
+//   const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
 
-  db.tx(async (t) => {
-    return await t.one(
-      userQuery
-    );
-  })
-  .then(async (user) => {
-    const match = await bcrypt.compare(req.body.password, user.password);
-    //save user details in session like in lab 8
-    if (!match) {
-      res.send({message: "Invalid input"});
-    } else {
-      // req.session.user = user;
-      // req.session.save();
-      // res.redirect('/discover')
-      // Authentication Middleware.
-      //const auth = (req, res, next) => {
-        // if (!req.session.user) {
-        //   // Default to login page.
-        //   //return res.redirect('/login');
-        // }
-        res.send({message: "Success"});
-        next();
-      };
+//   db.tx(async (t) => {
+//     return await t.one(
+//       userQuery
+//     );
+//   })
+//   .then(async (user) => {
+//     const match = await bcrypt.compare(req.body.password, user.password);
+//     //save user details in session like in lab 8
+//     if (!match) {
+//       res.send({message: "Invalid input"});
+//     } else {
+//       // req.session.user = user;
+//       // req.session.save();
+//       // res.redirect('/discover')
+//       // Authentication Middleware.
+//       //const auth = (req, res, next) => {
+//         // if (!req.session.user) {
+//         //   // Default to login page.
+//         //   //return res.redirect('/login');
+//         // }
+//         res.send({message: "Success"});
+//         next();
+//       };
 
-      // Authentication Required
-      app.use(auth);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-    // res.redirect('/register');
-  });
+//       // Authentication Required
+//       app.use(auth);
+//     });
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//     // res.redirect('/register');
+//   });
 
 
 // Authentication Middleware.
@@ -200,57 +269,57 @@ app.post('/login', async (req,res) => {
 
 // Authentication Required
 
-app.get('/home', (req,res) => {
-  res.render('pages/home');
-});
+// app.get('/home', (req,res) => {
+//   res.render('pages/home');
+// });
 
-app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.render("pages/login");
+// app.get("/logout", (req, res) => {
+//   req.session.destroy();
+//   res.render("pages/login");
 
-});
-app.get("/trips", (req, res)=>{
-  res.render("pages/trips");
-})
-app.post("/login", async (req, res) => {
-  res.redirect("/resort");
-})
+// });
+// app.get("/trips", (req, res)=>{
+//   res.render("pages/trips");
+// })
+// app.post("/login", async (req, res) => {
+//   res.redirect("/resort");
+// })
 
-// Make axios resort view call to see specifics of the ski resort
-app.get("/resort", (req, res) => {
+// // Make axios resort view call to see specifics of the ski resort
+// app.get("/resort", (req, res) => {
 
-  // const resortName = req.body.slug;
+//   // const resortName = req.body.slug;
 
-  // const resortName = 'buttermilk';
+//   // const resortName = 'buttermilk';
 
-  // const options = {
-  //   method: 'GET',
-  //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
-  //   headers: {
-  //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
-  //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
-  //   }
-  // };
+//   // const options = {
+//   //   method: 'GET',
+//   //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
+//   //   headers: {
+//   //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
+//   //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
+//   //   }
+//   // };
 
-  // axios.request(options).then(function (response) {
-  //   // console.log(response.data);
-    res.render("pages/resort");//, {
-  //     response
-  //   });
-  // }).catch(function (error) {
-  //   console.error(error);
-  //   res.render("pages/trips");
-  // });
+//   // axios.request(options).then(function (response) {
+//   //   // console.log(response.data);
+//     res.render("pages/resort");//, {
+//   //     response
+//   //   });
+//   // }).catch(function (error) {
+//   //   console.error(error);
+//   //   res.render("pages/trips");
+//   // });
 
-});
+// });
 
-// Adds the trip to the past trips table
-app.post("/resort/add", async (req, res) => {
-  // Need to finish writing this API
-  const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
-  const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
+// // Adds the trip to the past trips table
+// app.post("/resort/add", async (req, res) => {
+//   // Need to finish writing this API
+//   const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
+//   const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
 
-});
+// });
 
 
 // *****************************************************

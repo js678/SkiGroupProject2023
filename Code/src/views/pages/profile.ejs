@@ -1,12 +1,6 @@
 <%- include ('../partials/header') %>
+<%- include ('../partials/navbar') %>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-    }
-
     .container {
       display: flex;
       flex-direction: column;
@@ -21,27 +15,19 @@
       text-align: center;
     }
 
-    h1 {
+    #header1 {
       font-size: 48px;
       margin-top: 20px;
     }
 
-    form {
+    #profileForm {
       padding: 20px;
       margin: 20px;
       border-radius: 5px;
       max-width: 1000px;
       width: 100%;
     }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
+    #username, #email{
       display: block;
       margin-bottom: 10px;
       padding: 10px;
@@ -51,9 +37,7 @@
       box-sizing: border-box;
       font-size: 32px;
     }
-
-    button[type="submit"],
-    button[type="button"] {
+    #edit, #editProfile {
       background-color: #333;
       color: #fff;
       padding: 10px;
@@ -72,9 +56,7 @@
       cursor: pointer;
       font-size: 16px;
     }
-
-    button[type="submit"]:hover,
-    button[type="button"]:hover {
+    #edit, #editProfile {
       background-color: #444;
     }
 
@@ -87,17 +69,10 @@
       text-align: center;
     }
 
-    a {
-      color: #333;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
     label {
       font-size: 32px;
+      display: block;
+      margin-bottom: 5px;
     }
 
     #item_image {
@@ -136,8 +111,8 @@
     }
   </script>
   <div class="container">
-    <header>
-      <h1>Profile Page</h1>
+    <header id="header">
+      <h1 id="header1">Profile Page</h1>
     </header>
     <form id="profileForm" method="POST" action="/update-profile">
       <label for="username">Username: </label>
