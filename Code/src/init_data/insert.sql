@@ -1,4 +1,5 @@
-INSERT INTO users(username, email, password) VALUES ('bob', 'billy', 'asdasd');
+<<<<<<< Updated upstream
+INSERT INTO users(username, email, password) VALUES ('bob', 'billy@gmail.com', 'asdasd');
 
 
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Ski','829.99','K2','Dispatch 101', 'https://content.backcountry.com/images/items/900/K2S/K2SO0KS/ONECOL.jpg');
@@ -21,8 +22,8 @@ INSERT INTO products(product_type, price, brand, name, image) VALUES ('Poles','1
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Poles','120.71','G3','VIA Carbon Telescopic', 'https://content.backcountry.com/images/items/900/GGG/GGGW18Q/BLA.jpg');
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Poles','189.96','Scott','RC Pro', 'https://content.backcountry.com/images/items/900/SCO/SCOL15Z/YEL.jpg');
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Poles','63.57','Camp USA','Piz Aluminum', 'https://content.backcountry.com/images/items/900/CMP/CMPJ18U/ONECOL.jpg');
-
-INSERT INTO user_to_products(user_id, product_id) VALUES (1,1);
-INSERT INTO user_to_products(user_id, product_id) VALUES (1,10);
-INSERT INTO user_to_products(user_id, product_id) VALUES (1,4);
-INSERT INTO user_to_products(user_id, product_id) VALUES (1,15);
+=======
+INSERT INTO users(username, email, password) VALUES ('bob', 'billy@gmail.com', '$2b$10$ZtZmowrkVcvTqPPx4wcV6eQAL.mOIUWItHr7Ntmlan7nBw1VCEZX.');
+INSERT INTO user_to_trips(user_id, trip_id) VALUES (1,1);
+INSERT INTO past_trips(link, location, duration) VALUES ('https://cuboulder-csci3308.pages.dev/docs/intro/', 'colorado', 3);
+>>>>>>> Stashed changes
