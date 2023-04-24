@@ -252,6 +252,41 @@ app.post("/resort/add", async (req, res) => {
 
 });
 
+app.post('/add-to-cart', function(req, res) {
+  const productId = req.body.productId;
+  db.none('INSERT INTO cart_items (product_id) VALUES ($1)', [productId])
+    .then(function() {
+      res.sendStatus(200);
+    })
+    .catch(function(error) {
+      console.log(error);
+      res.sendStatus(500);
+    });
+});
+
+app.get('/products', function(req, res) {
+  db.any('SELECT * FROM products')
+    .then(function(data) {
+      res.render('pages/product', { products: data });
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+
+
+app.get('/search', function(req, res) {
+  const query = req.query.query; // Get the search query from the URL query string
+  db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
+    .then(function(data) {
+      res.render('pages/search', { results: data }); // Render the search page
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+
+
 
 
 app.get('/search', function(req, res) {
