@@ -1,4 +1,7 @@
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 // *****************************************************
 // <!-- Section 1 : Import Dependencies -->
 // *****************************************************
@@ -8,7 +11,11 @@ const app = express();
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
+<<<<<<< Updated upstream
 //const bcrypt = require('bcrypt'); //  To hash passwords
+=======
+const bcrypt = require('bcrypt'); //  To hash passwords
+>>>>>>> Stashed changes
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
 
 // *****************************************************
@@ -42,7 +49,12 @@ db.connect()
 
 app.set('view engine', 'ejs'); // set the view engine to EJS
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+<<<<<<< Updated upstream
 
+=======
+const path = require('path')
+app.use(express.static(path.join(__dirname, "/resources/js")))
+>>>>>>> Stashed changes
 // initialize session variables
 app.use(
   session({
@@ -64,11 +76,12 @@ const user = {
   password: undefined,
   email: undefined,
 };
+<<<<<<< Updated upstream
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 app.get('/', (req, res) => {
-  res.redirect('/cart');
+  res.redirect('/profile');
 });
 // TODO - Include your API routes here
 // app.get('/welcome', (req, res) => {
@@ -142,6 +155,13 @@ app.post('/purchase', (req, res) => {
       });
   }
 });
+=======
+
+
+app.get('/', (req, res) => {
+  res.redirect('/profile');
+});
+>>>>>>> Stashed changes
 
 app.get('/profile', (req, res) => {
   const query = "select * from users where user_id = $1;";
@@ -149,6 +169,7 @@ app.get('/profile', (req, res) => {
   db.any(query, [user.user_id])
     .then((user_data) => {
       const query = `select * from past_trips 
+<<<<<<< Updated upstream
                        left join user_to_trips
                        on past_trips.trip_id = user_to_trips.trip_id
                        where user_to_trips.user_id = $1;`;
@@ -176,12 +197,27 @@ app.get('/profile', (req, res) => {
                 message: err.message,
               });
             });
+=======
+                     left join user_to_trips
+                     on past_trips.trip_id = user_to_trips.trip_id
+                     where user_to_trips.user_id = $1;`;
+      db.any(query, [user.user_id])
+        .then((trip_data) => {
+          res.render("pages/profile", {
+            user_data,
+            trip_data,
+            message: `Successfully got results`,
+          });
+>>>>>>> Stashed changes
         })
         .catch((err) => {
           res.render("pages/profile", {
             user_data: [],
             trip_data: [],
+<<<<<<< Updated upstream
             item_data: [],
+=======
+>>>>>>> Stashed changes
             error: true,
             message: err.message,
           });
@@ -191,7 +227,10 @@ app.get('/profile', (req, res) => {
       res.render("pages/profile", {
         user_data: [],
         trip_data: [],
+<<<<<<< Updated upstream
         item_data: [],
+=======
+>>>>>>> Stashed changes
         error: true,
         message: err.message,
       });
@@ -202,6 +241,7 @@ app.post('/update-profile', (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
   const query = `update users 
+<<<<<<< Updated upstream
                    set username = $1,email = $2 
                    where user_id = $3 returning * ;`;
   if (username != null & email != null) {
@@ -217,13 +257,13 @@ app.post('/update-profile', (req, res) => {
   }
 });
 
-// app.get('/login', (req, res) => {
-//   res.render('pages/login')
-// });
+app.get('/login', (req, res) => {
+  res.render('pages/login')
+});
 
-// app.get('/register', (req, res) => {
-//   res.render('pages/register')
-// });
+app.get('/register', (req, res) => {
+  res.render('pages/register')
+});
 
 // Login submission
 // app.post('/login', async (req,res) => {
@@ -258,70 +298,137 @@ app.post('/update-profile', (req, res) => {
 //       app.use(auth);
 //     });
 //   })
-//   .catch((err) => {
-//     console.log(err);
+//   .catch((error) => {
+//     console.log(error);
 //     // res.redirect('/register');
 //   });
 
 
-// Authentication Middleware.
+app.get('/home', (req,res) => {
+  res.render('pages/home');
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.render("pages/login");
+
+});
+app.get("/trips", (req, res)=>{
+  res.render("pages/trips");
+})
+app.post("/login", async (req, res) => {
+  res.redirect("/resort");
+})
+
+// Make axios resort view call to see specifics of the ski resort
+app.get("/resort", (req, res) => {
+
+  // const resortName = req.body.slug;
+
+  // const resortName = 'buttermilk';
+
+  // const options = {
+  //   method: 'GET',
+  //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
+  //   headers: {
+  //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
+  //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
+  //   }
+  // };
+
+  // axios.request(options).then(function (response) {
+  //   // console.log(response.data);
+    res.render("pages/resort");//, {
+  //     response
+  //   });
+  // }).catch(function (error) {
+  //   console.error(error);
+  //   res.render("pages/trips");
+  // });
+
+});
+
+// Adds the trip to the past trips table
+app.post("/resort/add", async (req, res) => {
+  // Need to finish writing this API
+  const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
+  const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
+
+});
 
 
-// Authentication Required
 
-// app.get('/home', (req,res) => {
-//   res.render('pages/home');
-// });
-
-// app.get("/logout", (req, res) => {
-//   req.session.destroy();
-//   res.render("pages/login");
-
-// });
-// app.get("/trips", (req, res)=>{
-//   res.render("pages/trips");
-// })
-// app.post("/login", async (req, res) => {
-//   res.redirect("/resort");
-// })
-
-// // Make axios resort view call to see specifics of the ski resort
-// app.get("/resort", (req, res) => {
-
-//   // const resortName = req.body.slug;
-
-//   // const resortName = 'buttermilk';
-
-//   // const options = {
-//   //   method: 'GET',
-//   //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
-//   //   headers: {
-//   //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
-//   //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
-//   //   }
-//   // };
-
-//   // axios.request(options).then(function (response) {
-//   //   // console.log(response.data);
-//     res.render("pages/resort");//, {
-//   //     response
-//   //   });
-//   // }).catch(function (error) {
-//   //   console.error(error);
-//   //   res.render("pages/trips");
-//   // });
-
-// });
-
-// // Adds the trip to the past trips table
-// app.post("/resort/add", async (req, res) => {
-//   // Need to finish writing this API
-//   const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
-//   const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
-
-// });
+app.get('/search', function(req, res) {
+  const query = req.query.query; // Get the search query from the URL query string
+  db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
+    .then(function(data) {
+      res.render('pages/search', { results: data }); // Render the search template with the search results
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+=======
+                 set username = $1,email = $2 
+                 where user_id = $3 returning * ;`;
+  if(username != null & email != null) {
+  db.any(query, [username, email, user.user_id])
+    .then((data) => {
+      user.username = username;
+      user.email = email;
+      res.redirect('/profile');
+    })
+    .catch((err) => {
+      return console.log(err);
+    });
+  }
+});
 
 
+
+// *****************************************************
+// <!-- Section 4 : API Routes -->
+// *****************************************************
+
+// TODO - Include your API routes here
+app.get('/welcome', (req, res) => {
+    res.json({status: 'success', message: 'Welcome!'});
+  });
+
+// // Login submission
+app.post("/login", (req, res) => {
+    const password = req.body.password;
+    const username = req.body.username;
+    const query = "select * from users where users.username = $1";
+    const values = [username];
+
+    // get the student_id based on the emailid
+    db.one(query, values)
+      .then(async (data) => {
+        const hash = await bcrypt.hash(req.body.password, 10);
+        console.log(hash);
+        const match = await bcrypt.compare(req.body.password, data.password);
+        if (!match)
+        {
+            res.send({message: "Invalid Input"});
+        }
+        else
+        {
+            user.username = req.body.username;
+            user.password = req.body.password;
+            req.session.user = user;
+            req.session.save();
+            res.send({message: "Success"})
+        }
+
+      })
+      .catch((err) => {
+        console.log(err);
+        // res.redirect("/login");
+      });
+  });
+
+>>>>>>> Stashed changes
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************

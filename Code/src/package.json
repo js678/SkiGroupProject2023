@@ -23,6 +23,10 @@
     "start": "node index.js",
     "dev": "nodemon server.js",
     "test": "mocha",
+<<<<<<< Updated upstream
     "testandrun": "npm run prestart && npm run test && npm run start"
+=======
+    "testandrun": "npm run prestart && npm run test"
+>>>>>>> Stashed changes
   }
 }
