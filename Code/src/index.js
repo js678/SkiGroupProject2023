@@ -296,11 +296,19 @@ app.get("/trips", (req, res) => {
 
 
 });
+<<<<<<< HEAD
 app.post("/trips", (req, res)=>{
   res.redirect("pages/resort");
 })
+=======
+
+// app.get("/trips", (req, res)=>{
+//   res.render("pages/trips");
+// })
+
+>>>>>>> 492a6e8f03cb9a105636142adcc564c535b25c5a
 app.post("/login", async (req, res) => {
-  res.redirect("/resort");
+  res.redirect("/home");
 
 })
 
@@ -316,6 +324,7 @@ app.get("/resort", (req, res) => {
   // Gets all of the data from the trips table for the specific resort
   db.any(resortQuery, [resortName])
   .then(function(data){
+
     res.render("pages/resort", {
       status: 201,
       data: data,
@@ -405,7 +414,7 @@ app.post("/resort/add", async (req, res) => {
           })
           .catch(function (err){
             console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
+            res.redirect(`/resort?trip_name=${resortName}}`);
           });
           // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
         });
@@ -423,14 +432,14 @@ app.post("/resort/add", async (req, res) => {
           })
           .catch(function (err){
             console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
+            res.redirect(`/resort?trip_name=${resortName}}`);
           });
       // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
     });
   })
   .catch(function (err){
     console.log(err);
-    res.redirect(`/resort?trip_name=${trip_name}`);
+    res.redirect(`/resort?trip_name=${resortName}`);
   });
 });
 

@@ -34,7 +34,7 @@
                 <% var country = data[0]["country"]; %>
                 <% var region = data[0]["state_"]; %>
 
-                <% var namePrint = '<h1>' + name + ', ' + country + ', ' + region + '</h1>'; %>
+                <% var namePrint = '<h1>' + name + '</h1><h1>' + country + ', ' + region + '</h1>'; %>
                 <%- namePrint %>    
                 
             </div>
@@ -54,6 +54,8 @@
         <!-- Right side of the UI -->
         <div id="right_side" style="float:right;">
 
+          <% if(data[0]["link"] && data[0]["link"] != '-'){ %>
+
             <!-- Website link -->
             <div style="margin-bottom: 30px;">
                 <h3>Visit the website</h3>
@@ -62,6 +64,8 @@
                 <% var learnPrint  = '<p>Learn more <a href="' + link +'"> here</a></p>'; %>
                 <%- learnPrint %>
             </div>
+
+          <% } %>
 
             <!-- Input for trip duration and submit button for adding a trip -->
             <div style="margin-bottom: 30px;">
@@ -79,10 +83,9 @@
                 <% } %>
                 <form action="/resort/add" method="POST">
                   <div>
-                    <% var passData = '';
-                      passData += '<input type="text" id="trip_name" size="2px;" name="trip_name" value=' + name + ' readonly class="collapse">';
-                      passData += '<input type="text" id="trip_link" size="2px" name="trip_link" value=' + link + 'readonly class="collapse">';
-                    %>
+                    <% var passData = ''; %>
+                    <% passData += '<input type="text" id="trip_name" size="2px;" name="trip_name" value= "' + name + '" readonly class="collapse">'; %>
+                    <%  passData += '<input type="text" id="trip_link" size="2px" name="trip_link" value=' + link + 'readonly class="collapse">'; %>
                     <%- passData %>
                   </div>
                   <div>
