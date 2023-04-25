@@ -17,6 +17,7 @@ CREATE TABLE past_trips(
     duration INTEGER NOT NULL
 );
 
+<<<<<<< HEAD
 CREATE TABLE trips(
  trip_id SERIAL PRIMARY KEY,
  trip_name VARCHAR(50) NOT NULL,
@@ -30,3 +31,22 @@ CREATE TABLE trips(
  lat DECIMAL,
  lon DECIMAL,
 );
+=======
+CREATE TABLE user_to_products(
+    user_id SMALLINT,
+    product_id SMALLINT
+);
+
+CREATE TABLE products(
+    product_id SERIAL PRIMARY KEY,
+    product_type VARCHAR(50),
+    price FLOAT,
+    brand VARCHAR(50),
+    name VARCHAR(50),
+    image VARCHAR(300)
+);
+
+CREATE TABLE cart_items(
+    product_id SMALLINT
+);
+>>>>>>> main

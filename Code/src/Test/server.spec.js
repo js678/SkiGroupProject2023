@@ -31,7 +31,11 @@ describe('Server!', () => {
     chai
       .request(server)
       .post('/login')
-      .send({username: 'hello', password: 'world'})
+<<<<<<< Updated upstream
+      .send({username: 'hell', password: 'worl'})
+=======
+      .send({username: 'bob', password: 'asdasd'})
+>>>>>>> Stashed changes
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.body.message).to.equals('Success');
@@ -44,11 +48,41 @@ describe('Server!', () => {
     chai
       .request(server)
       .post('/login')
-      .send({username: 'hello', password: 'world'})
+<<<<<<< Updated upstream
+      .send({username: 'hell', password: 'worl'})
+=======
+      .send({username: 0, password: 'world'})
+>>>>>>> Stashed changes
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.body.message).to.equals('Invalid input');
         done();
       });
   });
+
+  it('positive : /register', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({username: 'hell', password: 'worl'})
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.body.message).to.equals('Success');
+        done();
+      });
+  });
+
+      it('Negative : /register. Checking invalid name', done => {
+        chai
+          .request(server)
+          .post('/register')
+          .send({username: 'hello', password: 'world'})
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equals('Already a member');
+            done();
+          });
+      });
+
+
 });

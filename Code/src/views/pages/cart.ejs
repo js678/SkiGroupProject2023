@@ -1,0 +1,93 @@
+<%- include ('../partials/header') %>
+<%- include ('../partials/navbar') %>
+<style>
+    * {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: Arial, sans-serif;
+}
+
+h1 {
+	text-align: center;
+}
+
+.cart-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin: 20px;
+	padding: 20px;
+	background-color: #f7f7f7;
+	border-radius: 10px;
+}
+
+.cart-item img {
+	width: 15%;
+	margin-right: 20px;
+	border-radius: 5px;
+}
+
+.item-details {
+	width: 70%;
+}
+
+.item-details h2 {
+	margin-top: 0;
+}
+
+.item-details p {
+	margin-top: 10px;
+}
+
+#remove-button {
+	background-color: #f44336;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	padding: 5px 10px;
+	margin-right: 10px;
+	cursor: pointer;
+}
+
+#purchase-button {
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	padding: 5px 10px;
+	cursor: pointer;
+	float: right;
+}
+#cart_form {
+    width: 50%;
+}
+.form-center {
+  display:flex;
+  justify-content: center;
+}
+</style>
+<h1>My Cart</h1>
+
+<%cart_data.forEach(item=> { %>
+<div class="form-center">
+    <form id="cart_form" method="POST" action="/purchase">
+        <div class="cart-item"> 
+            <img id="item_image" src=<%- item.image %>>
+            <div class="item-details">
+                <input type="hidden" name="item_name" value="<%- item.name %>"/>
+                <h2><%- item.name %></h2>
+                <a>Price: $<%- item.price %></a>
+                <p>Brand: <%- item.brand %></p>
+                <button type="submit" name="button" id="remove-button" value="remove">remove</button>
+                <button type="submit" name="button" id="purchase-button" value="add">Purchase</button>
+            </div>
+        </div>
+    </form>
+</div>
+<% }) %>
+
+<%- include ('../partials/footer') %>

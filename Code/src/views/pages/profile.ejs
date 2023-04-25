@@ -1,0 +1,152 @@
+<%- include ('../partials/header') %>
+<%- include ('../partials/navbar') %>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #header1 {
+      font-size: 48px;
+      margin-top: 20px;
+    }
+
+    #profileForm {
+      padding: 20px;
+      margin: 20px;
+      border-radius: 5px;
+      max-width: 1000px;
+      width: 100%;
+    }
+    #username, #email{
+      display: block;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 32px;
+    }
+    #edit, #editProfile {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #edit {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #edit, #editProfile {
+      background-color: #444;
+    }
+
+    td {
+      width: 500px;
+      text-align: center;
+    }
+
+    th {
+      text-align: center;
+    }
+
+    label {
+      font-size: 32px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    #item_image {
+      width: 51%;
+    }
+
+    table {
+      width: 100%;
+    }
+  </style>
+  <script>
+  function editData() {
+      const username = document.getElementById("username");
+      const email = document.getElementById("email");
+      const edit = document.getElementById("edit");
+
+      if (username.disabled) {
+        edit.textContent = "Cancel";
+        username.disabled = false;
+        email.disabled = false;
+      } else {
+        edit.textContent = "Edit";
+        username.disabled = true;
+        email.disabled = true;
+      }
+    }
+
+    function editDataUpdate() {
+      const username = document.getElementById("username");
+      const email = document.getElementById("email");
+      const edit = document.getElementById("edit");
+
+      edit.textContent = "Edit";
+      username.disabled = true;
+      email.disabled = true;
+    }
+  </script>
+  <div class="container">
+    <header id="header">
+      <h1 id="header1">Profile Page</h1>
+    </header>
+    <form id="profileForm" method="POST" action="/update-profile">
+      <label for="username">Username: </label>
+      <input type="text" id="username" name="username" value=<%- user_data[0].username %>>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" value=<%- user_data[0].email %>>
+      <p>Update Username and/or Email</p>
+      <button id="edit" onclick="editData()">Cancel</button>
+      <button type="submit" onclick="editDataUpdate()" id="editProfile">Update</button>
+    </form>
+    <table>
+      <tr>
+        <th>Past Trips</th>
+        <th>Past Items Ordered</th>
+      </tr>
+      <tr>
+        <td>
+          <% %>
+            <% var i=1; trip_data.forEach(item=> { %>
+              <li>[Trip <%- i %>] - <a href=<%- item.link %>>[Trip link]</a> - <%- item.location %> - <%-item.duration
+                      %> days</li>
+              <%i++; }) %>
+        </td>
+        <td>
+          <% %>
+            <% var i=1; item_data.forEach(item=> { %>
+              <li>[Item <%- i %>] - <%- item.name %> - $<%-item.price %></li>
+              <a><img id="item_image" src=<%- item.image %> /></a>
+              <%i++; }) %>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+  <%- include ('../partials/footer') %>
