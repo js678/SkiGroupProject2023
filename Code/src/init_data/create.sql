@@ -32,6 +32,7 @@ CREATE TABLE trips(
  trip_picture VARCHAR(500) NOT NULL,
  link VARCHAR(500) NOT NULL
 );
+
 CREATE TABLE user_to_products(
     user_id SMALLINT,
     product_id SMALLINT

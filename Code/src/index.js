@@ -278,9 +278,10 @@ app.get("/logout", (req, res) => {
   
 });
 app.get("/trips", (req, res) => {
-  const query = " SELECT * FROM trips";
+  const query = "SELECT * FROM trips;";
   db.any(query)
   .then((trips)=>{
+    console.log(trips)
     res.render("pages/trips",{
     trips,
    });
@@ -295,8 +296,8 @@ app.get("/trips", (req, res) => {
 
 
 });
-app.get("/trips", (req, res)=>{
-  res.render("pages/trips");
+app.post("/trips", (req, res)=>{
+  res.redirect("pages/resort");
 })
 app.post("/login", async (req, res) => {
   res.redirect("/resort");
