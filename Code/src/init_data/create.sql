@@ -27,8 +27,8 @@ CREATE TABLE trips(
  verticle SMALLINT,
  lifts SMALLINT,
  runs SMALLINT,
- lat DECIMAL,
- lon DECIMAL,
+ lat DECIMAL NOT NULL,
+ lon DECIMAL NOT NULL,
  trip_picture VARCHAR(500) NOT NULL,
  link VARCHAR(500) NOT NULL
 );

@@ -315,6 +315,7 @@ app.get("/resort", (req, res) => {
   // Gets all of the data from the trips table for the specific resort
   db.any(resortQuery, [resortName])
   .then(function(data){
+
     res.render("pages/resort", {
       status: 201,
       data: data,
@@ -334,6 +335,10 @@ app.post("/resort/add", async (req, res) => {
   duration = req.body.duration;
   resortName = req.body.trip_name;
   link = req.body.trip_link;
+
+  console.log(resortName);
+  console.log(duration);
+  console.log(link);
 
   // Queries
   const tripIdQuery = `SELECT trip_id FROM trips WHERE trip_name = $1;`;
@@ -404,7 +409,7 @@ app.post("/resort/add", async (req, res) => {
           })
           .catch(function (err){
             console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
+            res.redirect(`/resort?trip_name=${resortName}}`);
           });
           // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
         });
@@ -422,14 +427,14 @@ app.post("/resort/add", async (req, res) => {
           })
           .catch(function (err){
             console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
+            res.redirect(`/resort?trip_name=${resortName}}`);
           });
       // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
     });
   })
   .catch(function (err){
     console.log(err);
-    res.redirect(`/resort?trip_name=${trip_name}`);
+    res.redirect(`/resort?trip_name=${resortName}`);
   });
 });
 
