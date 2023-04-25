@@ -68,7 +68,7 @@ const user = {
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 app.get('/', (req, res) => {
-  res.redirect('/profile');
+  res.redirect('/home');
 });
 // TODO - Include your API routes here
 // app.get('/welcome', (req, res) => {
