@@ -282,95 +282,131 @@ app.post("/login", async (req, res) => {
 
 
 
-// Make axios resort view call to see specifics of the ski resort
+// Renders the resort page with the information from the trips database
 app.get("/resort", (req, res) => {
 
+  // Variables for the query
   const resortName = req.query.trip_name;
-  const tripAddition = req.query.added;
   const resortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
-  var message = "";
 
-  console.log(resortName);
-
-  // const resortName = 'buttermilk';
-
-    if(tripAddition=="success")
-    {
-      message = "Trip added!";
-    }
-    else if(tripAddition=="failed")
-    {
-      message = "There was a problem adding your trip, please try again";
-    }
-    // res.render("pages/resort", {
-    //   message: message,
-    // });
-
-    db.any(resortQuery, [resortName])
-    .then(function(data){
-      res.render("pages/resort", {
-        status: 201,
-        message: message,
-        data: data,
-      });
-    })
-    .catch(function(err){
-      console.log(err);
-      res.redirect("/trips");
+  // Gets all of the data from the trips table for the specific resort
+  db.any(resortQuery, [resortName])
+  .then(function(data){
+    res.render("pages/resort", {
+      status: 201,
+      data: data,
     });
+  })
+  .catch(function(err){
+    console.log(err);
+    res.redirect("/trips");
+  });
 
 });
 
 // Adds the trip to the past trips table
 app.post("/resort/add", async (req, res) => {
-  // Need to finish writing this API
+  
+  // Gets data from the form
   duration = req.body.duration;
-  trip_name = req.body.trip_name;
+  resortName = req.body.trip_name;
   link = req.body.trip_link;
 
-  const queryPastTrips = `INSERT INTO past_trips(link, location, duration) VALUES ($1, $2, $3) returning trip_id;`;
+  // Queries
+  const tripIdQuery = `SELECT trip_id FROM trips WHERE trip_name = $1;`;
+  const queryPastTrips = `INSERT INTO past_trips(trip_id, link, location, duration) VALUES ($1, $2, $3, $4) returning *;`;
   const queryUserToTrips = `INSERT INTO user_to_trips(user_id, trip_id) VALUES ($1, $2) returning *;`;
+  const reResortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
 
-  // Inserts into past trips table
-  db.any(queryPastTrips, [link, trip_name, duration])
-  .then(function (data) {
-    // console.log(data[0]["trip_id"]);
+  // Gets the trip_id
+  db.any(tripIdQuery, [resortName])
+  .then(function(data){
 
     const trip_id = data[0]["trip_id"];
 
-    // Find user in user's table
-    db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
-    .then( function(data) {
+    // Inserts into past trips table
+    db.any(queryPastTrips, [trip_id, link, resortName, duration])
+    .then(function (data) {
 
-      const user_id = data[0]["user_id"];
-
-      // Connects past trips to the user's account
-      db.any(queryUserToTrips, [user_id, trip_id])
+      // Find user in user's table
+      db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
       .then( function(data) {
 
-        // Re-renders the page 
-        // db.any(`SELECT * FROM trips WHERE trip_name = ${trip_name};`)
-        // .then( function(data) {
-          res.redirect(`/resort?trip_name=${trip_name}&added=success`);
-        // })
-        // .catch(function (err){
-          // console.log(err);
-        //   res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
-        // });
+        const user_id = data[0]["user_id"];
+
+        // Connects past trips to the user's account
+        db.any(queryUserToTrips, [user_id, trip_id])
+        .then( function(data) {
+
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              message: "Trip added!"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+        })
+        .catch(function (err){
+          console.log(err);
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              error: true,
+              message: "There was a problem adding your trip, please try again"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+        });
       })
-      .catch(function (err){
-        console.log(err);
-        res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
-      });
-    })
-      .catch(function (err){
-        console.log(err);
-        res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
-      });
-    })
+        .catch(function (err){
+          console.log(err);
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              error: true,
+              message: "There was a problem adding your trip, please try again"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+          // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+        });
+      })
+    .catch(function (err){
+      console.log(err);
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              error: true,
+              message: "There was a problem adding your trip, please try again"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+      // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+    });
+  })
   .catch(function (err){
     console.log(err);
-    res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+    res.redirect(`/resort?trip_name=${trip_name}`);
   });
 });
 
