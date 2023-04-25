@@ -295,11 +295,13 @@ app.get("/trips", (req, res) => {
 
 
 });
-app.get("/trips", (req, res)=>{
-  res.render("pages/trips");
-})
+
+// app.get("/trips", (req, res)=>{
+//   res.render("pages/trips");
+// })
+
 app.post("/login", async (req, res) => {
-  res.redirect("/resort");
+  res.redirect("/home");
 
 })
 
@@ -335,10 +337,6 @@ app.post("/resort/add", async (req, res) => {
   duration = req.body.duration;
   resortName = req.body.trip_name;
   link = req.body.trip_link;
-
-  console.log(resortName);
-  console.log(duration);
-  console.log(link);
 
   // Queries
   const tripIdQuery = `SELECT trip_id FROM trips WHERE trip_name = $1;`;
