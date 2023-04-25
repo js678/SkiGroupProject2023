@@ -2,58 +2,36 @@
 
 <main>
     <div class="container" style="margin-top: 30px; margin-bottom: 30px;">
-<<<<<<< HEAD
         <form action="/trips" method="post">
             
-=======
->>>>>>> main
         <table class="table">
             <thead>
               <tr>
                 <th scope="col">Trip Picture</th>
                 <th scope="col">Trip Name</th>
-<<<<<<< HEAD
                 <th scope="col">Country</th>
                 <th scope="col">State</th>
-=======
-                <th scope="col">State/Country</th>
->>>>>>> main
                 <th scope="col">Learn More</th>
               </tr>
             </thead>
         
-<<<<<<< HEAD
            <% trips.forEach(function(trips) {%>
                   <tbody>
                       <tr>
-                        <th scope="row">-</th>
+                        <th scope="row"><%- trips.trip_picture %></th>
                         <td><%- trips.trip_name %></td>
-=======
-                <form action="/trips" method="post">
-                  <tbody>
-                      <tr>
-                        <th scope="row">-</th>
->>>>>>> main
-                        <td>-</td>
-                        <td>-</td>
-                      
+                        <td><%- trips.country %></td>
+                        <td><%- trips.state_ %></td>
                     
                  <td> 
                   <input type="submit" value="More Information" />
                  </td>
                 </tr>
-<<<<<<< HEAD
             
                 </tbody>
             <% }) %>
           </table>
         </form>
-=======
-                </tbody>
-                </form>
-          </table>
-      
->>>>>>> main
     </div>
 </main>
 

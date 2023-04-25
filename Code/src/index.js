@@ -275,7 +275,6 @@ app.get('/home', (req,res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/login");
-<<<<<<< HEAD
   
 });
 app.get("/trips", (req, res) => {
@@ -285,17 +284,14 @@ app.get("/trips", (req, res) => {
     res.render("pages/trips",{
     trips,
    });
-  }
-  )
-=======
-
-});
-app.get("/trips", (req, res)=>{
-  res.render("pages/trips");
-})
-app.post("/login", async (req, res) => {
-  res.redirect("/resort");
->>>>>>> main
+  })
+  .catch((err) => {
+    res.render("pages/trips", {
+      trips: [],
+      error: true,
+      message: err.message,
+    });
+  });
 })
 app.post("/trips", async (req, res)=>{
   res.redirect('/resort')
