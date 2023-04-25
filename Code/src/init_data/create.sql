@@ -28,10 +28,16 @@ CREATE TABLE trips(
  lifts SMALLINT,
  runs SMALLINT,
  lat DECIMAL,
+<<<<<<< HEAD
  lon DECIMAL,
  trip_picture VARCHAR(500) NOT NULL,
  link VARCHAR(500) NOT NULL
 );
+=======
+ lon DECIMAL
+);
+
+>>>>>>> ad0ee7be1b180f8090e8aa8a20475f0587978ab4
 CREATE TABLE user_to_products(
     user_id SMALLINT,
     product_id SMALLINT
@@ -48,4 +54,8 @@ CREATE TABLE products(
 
 CREATE TABLE cart_items(
     product_id SMALLINT
+<<<<<<< HEAD
 );
+=======
+);
+>>>>>>> ad0ee7be1b180f8090e8aa8a20475f0587978ab4
