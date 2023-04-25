@@ -1,38 +1,7 @@
-<!---
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta charset="utf-8">
-    <style>
-        /* Always set the map height explicitly to define the size of the div
-         * element that contains the map. */
-        #map {
-          height: 60%;
-          width: 60%;
-          margin-left: 60px;
-        }
-        /* Optional: Makes the sample page fill the window. */
-        html, body {
-          height: 100%;
-          margin: 10px;
-          padding: 0;
-        }
-      </style>
-    <title>CSCI 3308 Lab 9</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">  
-</head>
--->
-
-
 <%- include ('../partials/header') %>
 <%- include ('../partials/navbar') %>
 
+<!-- Styles the map -->
 <style>
   /* Always set the map height explicitly to define the size of the div
    * element that contains the map. */
@@ -48,18 +17,10 @@
     padding: 0;
   }
 </style>
-<!-- Need a different header because of the google maps api -->
-
-
 
 <body>
 <main>
-
-  <!-- include ('../partials/navbar') -->
-
     <div class="container" style="margin-top: 30px; margin-bottom: 30px;">
-
-        <% console.log(data); %>
 
         <title>Resort</title>
 
@@ -68,10 +29,6 @@
 
             <!-- Resort name, country, and region -->
             <div style="margin-bottom: 80px;">
-                <!-- console.log(response.data.data.name); -->
-                <!-- var name = response.data.data.name; -->
-                <!-- var country = response.data.data.country; -->
-                <!-- var region = response.data.data.region; -->
 
                 <% var name = data[0]["trip_name"]; %>
                 <% var country = data[0]["country"]; %>
@@ -88,22 +45,20 @@
                     <form style="text-align: center; margin-bottom: 20px;">
                         <label>Starting Destination:</label>
                         <input size="50px" id="from" type="text">
-                        
-                        <% var tripNamePrint = '<input id="trip_name" readonly class="collapse" value=' + name + '>'; %>
-                        <%- tripNamePrint %>
-
                         <button type="button" class="btn btn-primary" onclick="calcRoute()">Submit</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Link to resort website -->
-        <div id="right_side" style="float:right; background-color: transparent;">
+        <!-- Right side of the UI -->
+        <div id="right_side" style="float:right;">
+
+            <!-- Website link -->
             <div style="margin-bottom: 30px;">
                 <h3>Visit the website</h3>
-                <!-- var link = data[0]["link"]; -->
-                <% var link = 'http://localhost:3000/resort'; %>
+                <% var link = data[0]["link"]; %>
+                <!-- <% var link = 'http://localhost:3000/resort'; %> -->
                 <% var learnPrint  = '<p>Learn more <a href="' + link +'"> here</a></p>'; %>
                 <%- learnPrint %>
             </div>
@@ -111,6 +66,7 @@
             <!-- Input for trip duration and submit button for adding a trip -->
             <div style="margin-bottom: 30px;">
               <h3>Want to go on a trip?</h3>
+
               <!-- Displays message for adding resorts -->
               <% if (locals.message) { %>
                 <div
@@ -128,8 +84,6 @@
                       passData += '<input type="text" id="trip_link" size="2px" name="trip_link" value=' + link + 'readonly class="collapse">';
                     %>
                     <%- passData %>
-                    <!-- <input type="text" id="trip_name" size="2px;" name="trip_name" value="hello" readonly class="collapse"> -->
-                    <!-- <input type="text" id="trip_link" size="2px" name="trip_link" value="link" readonly class="collapse"> -->
                   </div>
                   <div>
                     <label class="form-label">Trip Duration: &nbsp;</label>
@@ -139,27 +93,51 @@
                 </form>
             </div>
 
-            <!-- List of ski lifts and their statuses -->
-            <div>
-                <h3>Ski Lifts</h3>
+            <div style="font-size: large;">
+              <h3>More Info:</h3>
+              <br>
 
-                <% var liftPrint = ''; %>
-                <%  liftPrint += '<p>Number of Lifts: ' + data[0]["lifts"] + '</p>'; %>
+              <!-- Summit height information -->
+              <% if(data[0]["summit_"] && data[0]["summit_"] != ""){
+                var summitPrint = '<p>Summit Height: ' + data[0]["summit_"] + '</p>'; %>
+
+                <%- summitPrint %>
+              <% } %>
+
+              <!-- Base height information -->
+              <% if(data[0]["base"] && data[0]["base"] != ""){
+                var basePrint = '<p>Base Height: ' + data[0]["base"] + '</p>'; %>
+
+                <%- basePrint %>
+              <% } %>
+
+              <!-- Verticle height information-->
+              <% if(data[0]["verticle"] && data[0]["verticle"] != ""){
+                var verticlePrint = '<p>Verticle: ' + data[0]["verticle"] + '</p>'; %>
+
+                <%- verticlePrint %>
+              <% } %>
+
+              <!-- Number of ski lifs -->
+              <% if(data[0]["lifts"] && data[0]["lifts"] != ""){
+                var liftPrint = '<p>Number of Ski Lifts: ' + data[0]["lifts"] + '</p>'; %>
 
                 <%- liftPrint %>
+              <% } %>
 
+              <!-- Runs information-->
+              <% if(data[0]["runs"] && data[0]["runs"] != ""){
+                var runsPrint = '<p>Number of Runs: ' + data[0]["runs"] + '</p>'; %>
+
+                <%- runsPrint %>
+              <% } %>
             </div>
 
         </div>
     </div>
 </main>
 
-<!-- var latitude = response.data.data.location.latitude; -->
-<!-- var longitude = response.data.data.location.longitude; -->
-
-<!-- console.log(latitude); -->
-<!-- console.log(longitude); -->
-
+<!-- Creates invisible forms to pass the longitude and latitude data to the script -->
 <div>
   <% var latitude = data[0]["lat"];
      var longitude = data[0]["lon"];
@@ -169,12 +147,9 @@
   <%- lonPrint %>
 </div>
 
-<div style="font-size:x-large"></div>
-
 <!-- Google maps api call -->
 <div id="map"></div>
 <div id="output"></div>
-
 
 <script>
 
@@ -257,26 +232,9 @@ function calcRoute() {
       }
     })
   }
-  
-
-//   function initMap() {
-//     map = new google.maps.Map(document.getElementById('map'), {
-//       center: latLong,
-//       zoom: 8
-//     });
-
-//     new google.maps.Marker({
-//         position: latLong,
-//         map,
-//     })
-//   }
 </script>
 <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR0bDVkvqkcO5w77JuAo-bT_gKNAkGU_Q&libraries=places&callback=initMap">
 </script>
-
-<!--
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR0bDVkvqkcO5w77JuAo-bT_gKNAkGU_Q&callback=initMap"
-async defer></script> -->
 
 <%- include ('../partials/footer') %>
