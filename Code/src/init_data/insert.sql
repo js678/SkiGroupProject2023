@@ -54,6 +54,8 @@ INSERT INTO products(product_type, price, brand, name, image) VALUES ('Snowboard
 INSERT INTO users(username, email, password) VALUES ('bob', 'billy@gmail.com', '$2b$10$ZtZmowrkVcvTqPPx4wcV6eQAL.mOIUWItHr7Ntmlan7nBw1VCEZX.');
 INSERT INTO user_to_trips(user_id, trip_id) VALUES (1,1);
 INSERT INTO past_trips(link, location, duration) VALUES ('https://cuboulder-csci3308.pages.dev/docs/intro/', 'colorado', 3);
+
+
 INSERT INTO trips(trip_name, country, state_, summit_, base, verticle, lifts, runs, lat, lon, trip_picture, link) VALUES 
 ('49(degrees) North, WA','United States of America','Washington','5774','3923','1851','6','68','49','-115.84','https://www.ski49n.com/images/uploads/d2.jpg','https://www.ski49n.com/'),
 ('Afton Alps, MN','United States of America','Minnesota','700','350','350','21','48','44.85','-92.79','https://dam-assets.vailresorts.com/is/image/vailresorts/2021112_AA_HOLDEN_004-1:Epic-Pass-Home-Page-Hero-Desktop?resMode=sharp2&w=3840&h=900&wid=1263&fit=constrain,1&dpr=on,1.5','https://www.aftonalps.com/'),

@@ -296,17 +296,9 @@ app.get("/trips", (req, res) => {
 
 
 });
-<<<<<<< HEAD
 app.post("/trips", (req, res)=>{
   res.redirect("pages/resort");
 })
-=======
-
-// app.get("/trips", (req, res)=>{
-//   res.render("pages/trips");
-// })
-
->>>>>>> 492a6e8f03cb9a105636142adcc564c535b25c5a
 app.post("/login", async (req, res) => {
   res.redirect("/home");
 
