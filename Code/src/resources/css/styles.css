@@ -27,7 +27,7 @@ body{
     font-size: 16px;
 }
 
-.navbar li a{
+.text-nav{
     font-family: "Courier New", Courier, monospace;
     color: white
 }
