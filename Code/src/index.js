@@ -273,11 +273,24 @@ app.get("/logout", (req, res) => {
   res.render("pages/login");
 
 });
-app.get("/trips", (req, res)=>{
-  res.render("pages/trips");
+app.get("/trips", (req, res) => {
+  const query = " SELECT * FROM trips";
+  db.any(query)
+  .then((trips)=>{
+    res.render("pages/trips",{
+    trips,
+   });
+  })
+  .catch((err) => {
+    res.render("pages/trips", {
+      trips: [],
+      error: true,
+      message: err.message,
+    });
+  });
 })
-app.post("/login", async (req, res) => {
-  res.redirect("/resort");
+app.post("/trips", async (req, res)=>{
+  res.redirect('/resort')
 })
 
 // Make axios resort view call to see specifics of the ski resort
@@ -363,6 +376,9 @@ app.get('/search', function(req, res) {
       console.log(error);
     });
 });
+
+app.use(express.static('resources'))
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************

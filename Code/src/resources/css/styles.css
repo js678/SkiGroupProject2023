@@ -25,4 +25,17 @@ body{
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-  }
+}
+
+.navbar li a{
+    font-family: "Courier New", Courier, monospace;
+    color: white
+}
+
+.video {
+    pointer-events: none;
+}
+
+.HTML-Embed {
+    pointer-events: none;
+}
