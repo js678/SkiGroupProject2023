@@ -471,17 +471,6 @@ app.get('/search', function(req, res) {
 
 
 
-app.get('/search', function(req, res) {
-  const query = req.query.query; // Get the search query from the URL query string
-  db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
-    .then(function(data) {
-      res.render('pages/search', { results: data }); // Render the search template with the search results
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
-});
-
 app.use(express.static('resources'))
 
 // *****************************************************
