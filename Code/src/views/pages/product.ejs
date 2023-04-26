@@ -1,0 +1,42 @@
+<%- include ('../partials/header') %>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Product Page</title>
+</head>
+<body>
+	<h1>Product Page</h1>
+	<form action="/search" method="get">
+		<label for="query">Search:</label>
+		<input type="text" name="query" id="query">
+		<button type="submit">Search</button>
+	</form>
+	<table>
+        <thead>
+		<tr>
+            <th>Product Type</th>
+            <th>Price</th>
+            <th>Brand</th>
+            <th>Name</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+		<% products.forEach(function(product) { %>
+			<tr>
+				<td><%= product.product_type %></td>
+                <td><%= product.price %></td>
+                <td><%= product.brand %></td>
+                <td><%= product.name %></td>
+                <td><img src="<%= product.image %>" /></td>
+                <td><form action="/add-to-cart" method="post">
+                <input type="hidden" name="product_id" value="<%= product.product_id %>">
+                <button type="submit">Add to Cart</button>
+                </form>
+                <td>
+			</tr>
+		<% }); %>
+	</table>
+</body>
+</html>
+
+<%- include ('../partials/footer') %>

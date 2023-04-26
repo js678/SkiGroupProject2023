@@ -32,6 +32,11 @@
             <td><%= results.brand %></td>
             <td><%= results.name %></td>
             <td><img src="<%= results.image %>" /></td>
+            <td><form action="/add-to-cart" method="post">
+              <input type="hidden" name="product_id" value="<%= results.product_id %>">
+              <button type="submit">Add to Cart</button>
+            </form>
+          </td>
           </tr>
           <% }) %>
         </tbody>
@@ -39,7 +44,6 @@
     <% } %>
   </body>
 </html>
-
 
 
 <%- include ('../partials/footer') %>
