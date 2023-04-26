@@ -1,67 +1,243 @@
 <%- include ('../partials/header') %>
+<%- include ('../partials/navbar') %>
 
+<!-- Styles the map -->
+<style>
+  /* Always set the map height explicitly to define the size of the div
+   * element that contains the map. */
+  #map {
+    height: 60%;
+    width: 60%;
+    margin-left: 60px;
+  }
+  /* Optional: Makes the sample page fill the window. */
+  html, body {
+    height: 110%;
+    margin: 10px;
+    padding: 0;
+  }
+</style>
+
+<body>
 <main>
-    <div class="container" style="margin-top: 30px; margin-bottom: 30px;">
+    <div class="container" style="margin-top: 30px; margin-bottom: 100px;">
+
         <title>Resort</title>
+
+        <!-- Left side of the UI -->
         <div id="left_side" style="float: left;">
+
+            <!-- Resort name, country, and region -->
             <div style="margin-bottom: 80px;">
-                <h1>Resort Name</h1>
+
+                <% var name = data[0]["trip_name"]; %>
+                <% var country = data[0]["country"]; %>
+                <% var region = data[0]["state_"]; %>
+
+                <% var namePrint = '<h1>' + name + '</h1><h1>' + country + ', ' + region + '</h1>'; %>
+                <%- namePrint %>    
+                
             </div>
+
+            <!-- Input for starting destination for google maps -->
             <div>
                 <div>
                     <form style="text-align: center; margin-bottom: 20px;">
                         <label>Starting Destination:</label>
-                        <input type="text">
+                        <input size="50px" id="from" type="text">
+                        <button type="button" class="btn btn-primary" onclick="calcRoute()">Submit</button>
                     </form>
-                </div>
-                <div style="background-color: cadetblue;">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <p style="color:white; font-size: xx-large;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; Map here</p>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <!-- Google maps map here -->
                 </div>
             </div>
         </div>
+
+        <!-- Right side of the UI -->
         <div id="right_side" style="float:right;">
+
+          <% if(data[0]["link"] && data[0]["link"] != '-'){ %>
+
+            <!-- Website link -->
             <div style="margin-bottom: 30px;">
-                <p>Learn more <a>here</a></p> <!-- Link to resort website here -->
+                <h3>Visit the website</h3>
+                <% var link = data[0]["link"]; %>
+                <!-- <% var link = 'http://localhost:3000/resort'; %> -->
+                <% var learnPrint  = '<p>Learn more <a href="' + link +'"> here</a></p>'; %>
+                <%- learnPrint %>
             </div>
 
+          <% } %>
+
+            <!-- Input for trip duration and submit button for adding a trip -->
             <div style="margin-bottom: 30px;">
-                <form>
-                    <label>Trip Duration: &nbsp;</label>
-                    <input placeholder="1,2,3 ... Days" type="text" size="10px;">
-                    <button>Add Trip</button> <!-- Add trip to past trips database -->
+              <h3>Want to go on a trip?</h3>
+
+              <!-- Displays message for adding resorts -->
+              <% if (locals.message) { %>
+                <div
+                  class="alert alert-<%- locals.error ? 'danger' : 'success' %>"
+                  role="alert"
+                  style="margin-top: 10px;"
+                >
+                  <%= message %>
+                </div>
+                <% } %>
+                <form action="/resort/add" method="POST">
+                  <div>
+                    <% var passData = ''; %>
+                    <% passData += '<input type="text" id="trip_name" size="2px;" name="trip_name" value= "' + name + '" readonly class="collapse">'; %>
+                    <%  passData += '<input type="text" id="trip_link" size="2px" name="trip_link" value=' + link + 'readonly class="collapse">'; %>
+                    <%- passData %>
+                  </div>
+                  <div>
+                    <label class="form-label">Trip Duration: &nbsp;</label>
+                    <input required placeholder="1,2,3 ... Days" type="text" size="10px;" id="duration" name="duration">
+                    <button type="submit" class="btn btn-primary">Add Trip</button>
+                  </div>
                 </form>
             </div>
 
-            <div>
-                <h3>Ski Lift Status</h3>
-                <p>Lift 1</p>
-                <p>Lift 2</p>
-                <p>Lift 3</p>
-                <p>Lift 4</p>
-                <p>Lift 5</p>
-                <p>Lift 6</p>
+            <div style="font-size: large;">
+              <h3>More Info:</h3>
+              <br>
+
+              <!-- Summit height information -->
+              <% if(data[0]["summit_"] && data[0]["summit_"] != ""){
+                var summitPrint = '<p>Summit Height: ' + data[0]["summit_"] + '</p>'; %>
+
+                <%- summitPrint %>
+              <% } %>
+
+              <!-- Base height information -->
+              <% if(data[0]["base"] && data[0]["base"] != ""){
+                var basePrint = '<p>Base Height: ' + data[0]["base"] + '</p>'; %>
+
+                <%- basePrint %>
+              <% } %>
+
+              <!-- Verticle height information-->
+              <% if(data[0]["verticle"] && data[0]["verticle"] != ""){
+                var verticlePrint = '<p>Verticle: ' + data[0]["verticle"] + '</p>'; %>
+
+                <%- verticlePrint %>
+              <% } %>
+
+              <!-- Number of ski lifs -->
+              <% if(data[0]["lifts"] && data[0]["lifts"] != ""){
+                var liftPrint = '<p>Number of Ski Lifts: ' + data[0]["lifts"] + '</p>'; %>
+
+                <%- liftPrint %>
+              <% } %>
+
+              <!-- Runs information-->
+              <% if(data[0]["runs"] && data[0]["runs"] != ""){
+                var runsPrint = '<p>Number of Runs: ' + data[0]["runs"] + '</p>'; %>
+
+                <%- runsPrint %>
+              <% } %>
             </div>
 
         </div>
     </div>
 </main>
+
+<!-- Creates invisible forms to pass the longitude and latitude data to the script -->
+<div>
+  <% var latitude = data[0]["lat"];
+     var longitude = data[0]["lon"];
+     var latPrint = '<input id="latit" readonly class="collapse" value=' + latitude + '>';
+     var lonPrint = '<input id="longt" readonly class="collapse" value=' + longitude + '>' %>
+  <%- latPrint %>
+  <%- lonPrint %>
+</div>
+
+<!-- Google maps api call -->
+<div id="map"></div>
+<div id="output"></div>
+
+<script>
+
+// Set map variables
+var map;
+const latLong = {lat: parseFloat(document.getElementById("latit").value), lng: parseFloat(document.getElementById("longt").value)};
+var directionsService;
+var directionsDisplay;
+
+// Callback function to display map
+function initMap(){
+
+  // Sets map options
+  var mapOptions = {
+    center: latLong,
+    zoom: 8,
+  };
+
+
+  // Create Map
+  map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+  // Sets marker for ski resort
+  new google.maps.Marker({
+    position: latLong,
+    map,
+    })
+
+  // Create a directions service object to use the route method and get a result for our request
+  directionsService = new google.maps.DirectionsService();
+
+  // Create a directions renderer object to display the route
+  directionsDisplay = new google.maps.DirectionsRenderer();
+
+  // Bind the directions renderer to the map
+  directionsDisplay.setMap(map);   //
+
+  // Create autocomplete object for the input
+  var options = {
+    types: ['address']
+  }
+
+  var input = document.getElementById("from");
+  var autocomplete = new google.maps.places.Autocomplete(input, options);
+ 
+}
+
+// Calculates the route
+function calcRoute() {
+
+    // Create request
+    var request = {
+      origin: document.getElementById("from").value,
+      destination: latLong,
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.IMPERIAL
+    }
+
+    // Pass the request to the route method
+    directionsService.route(request, (result, status) => {
+      if(status == google.maps.DirectionsStatus.OK){
+
+        // Get distance and time
+        const output = document.querySelector('#output')
+        output.innerHTML = "<div class='alert-info' style='font-size:x-large; margin-left: 40px;'> <br /> Driving Distance: " + result.routes[0].legs[0].distance.text + ".<br />Drive Time: " + result.routes[0].legs[0].duration.text + ". <br> <br> <br> </div>";
+        
+        // Display route
+        directionsDisplay.setDirections(result);
+
+      }
+      else{
+        // Delete route from map
+        directionsDisplay.setDirections({routes: []});
+
+        // Center map
+        map.setCenter(latLong);
+
+        // Show error message
+        output.innerHTML = "<div class='alert-danger'> Could not retrieve driving distance. </div>";
+      }
+    })
+  }
+</script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR0bDVkvqkcO5w77JuAo-bT_gKNAkGU_Q&libraries=places&callback=initMap">
+</script>
 
 <%- include ('../partials/footer') %>

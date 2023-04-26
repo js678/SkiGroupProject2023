@@ -7,7 +7,11 @@ const app = express();
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
+
+//const bcrypt = require('bcrypt'); //  To hash passwords
+
 const bcrypt = require('bcrypt'); //  To hash passwords
+
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
 
 // *****************************************************
@@ -226,42 +230,68 @@ app.get('/register', (req, res) => {
 });
 
 // Login submission
-// app.post('/login', async (req,res) => {
-//   // check if password from request matches with password in DB
-//   const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
+app.post('/login', async (req,res) => {
+  // check if password from request matches with password in DB
+  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
 
-//   db.tx(async (t) => {
-//     return await t.one(
-//       userQuery
-//     );
-//   })
-//   .then(async (user) => {
-//     const match = await bcrypt.compare(req.body.password, user.password);
-//     //save user details in session like in lab 8
-//     if (!match) {
-//       res.send({message: "Invalid input"});
-//     } else {
-//       // req.session.user = user;
-//       // req.session.save();
-//       // res.redirect('/discover')
-//       // Authentication Middleware.
-//       //const auth = (req, res, next) => {
-//         // if (!req.session.user) {
-//         //   // Default to login page.
-//         //   //return res.redirect('/login');
-//         // }
-//         res.send({message: "Success"});
-//         next();
-//       };
+  db.tx(async (t) => {
+    return await t.one(
+      userQuery
+    );
+  })
+  .then(async (user) => {
+    const match = await bcrypt.compare(req.body.password, user.password);
+    //save user details in session 
+    if (!match) {
+      throw new Error(`Incorrect username or password`);
+    } else {
+      user.user_id = data[0].user_id;
+      user.email = data.email;
+      req.session.user = user;
+      req.session.save();
+      
+      // Authentication Middleware.
+      const auth = (req, res, next) => {
+        if (!req.session.user) {
+          // Default to login page.
+          return res.redirect('/login');
+        }
+        next();
+      };
 
-//       // Authentication Required
-//       app.use(auth);
-//     });
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//     // res.redirect('/register');
-//   });
+      // Authentication Required
+      app.use(auth);
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+    res.redirect('/register');
+  });
+});
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const createUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING user_id;`;
+
+  db.one(createUserQuery, [username, hashedPassword])
+    .then(user => {
+      // Save user details in session 
+      req.session.user = {
+        user_id: user.user_id,
+        username: username
+      };
+      req.session.save();
+      
+      // Redirect to home page
+      res.redirect('/home');
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Error creating new user');
+    });
+});
 
 
 app.get('/home', (req,res) => {
@@ -271,12 +301,13 @@ app.get('/home', (req,res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/login");
-
+  
 });
 app.get("/trips", (req, res) => {
-  const query = " SELECT * FROM trips";
+  const query = "SELECT * FROM trips;";
   db.any(query)
   .then((trips)=>{
+    console.log(trips)
     res.render("pages/trips",{
     trips,
    });
@@ -288,45 +319,145 @@ app.get("/trips", (req, res) => {
       message: err.message,
     });
   });
+
+
+});
+app.post("/trips", (req, res)=>{
+  res.redirect("pages/resort");
 })
-app.post("/trips", async (req, res)=>{
-  res.redirect('/resort')
+app.post("/login", async (req, res) => {
+  res.redirect("/resort");
+
 })
 
-// Make axios resort view call to see specifics of the ski resort
+
+
+// Renders the resort page with the information from the trips database
 app.get("/resort", (req, res) => {
 
-  // const resortName = req.body.slug;
+  // Variables for the query
+  const resortName = req.query.trip_name;
+  const resortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
 
-  // const resortName = 'buttermilk';
-
-  // const options = {
-  //   method: 'GET',
-  //   url: `https://ski-resorts-and-conditions.p.rapidapi.com/v1/resort/${resortName}`,
-  //   headers: {
-  //     'X-RapidAPI-Key': '1fdf96ffb7msh43fba966a30224dp13cfa8jsnfeffe4d55e5e',
-  //     'X-RapidAPI-Host': 'ski-resorts-and-conditions.p.rapidapi.com'
-  //   }
-  // };
-
-  // axios.request(options).then(function (response) {
-  //   // console.log(response.data);
-    res.render("pages/resort");//, {
-  //     response
-  //   });
-  // }).catch(function (error) {
-  //   console.error(error);
-  //   res.render("pages/trips");
-  // });
+  // Gets all of the data from the trips table for the specific resort
+  db.any(resortQuery, [resortName])
+  .then(function(data){
+    res.render("pages/resort", {
+      status: 201,
+      data: data,
+    });
+  })
+  .catch(function(err){
+    console.log(err);
+    res.redirect("/trips");
+  });
 
 });
 
 // Adds the trip to the past trips table
 app.post("/resort/add", async (req, res) => {
-  // Need to finish writing this API
-  const queryPastTrips = `INSERT INTO past_trips() VALUES ($1, $2, $3);`;
-  const queryUserToTrips = `INSERT INTO user_to_trips() VALUES ($1, $2);`;
+  
+  // Gets data from the form
+  duration = req.body.duration;
+  resortName = req.body.trip_name;
+  link = req.body.trip_link;
 
+  // Queries
+  const tripIdQuery = `SELECT trip_id FROM trips WHERE trip_name = $1;`;
+  const queryPastTrips = `INSERT INTO past_trips(trip_id, link, location, duration) VALUES ($1, $2, $3, $4) returning *;`;
+  const queryUserToTrips = `INSERT INTO user_to_trips(user_id, trip_id) VALUES ($1, $2) returning *;`;
+  const reResortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
+
+  // Gets the trip_id
+  db.any(tripIdQuery, [resortName])
+  .then(function(data){
+
+    const trip_id = data[0]["trip_id"];
+
+    // Inserts into past trips table
+    db.any(queryPastTrips, [trip_id, link, resortName, duration])
+    .then(function (data) {
+
+      // Find user in user's table
+      db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
+      .then( function(data) {
+
+        const user_id = data[0]["user_id"];
+
+        // Connects past trips to the user's account
+        db.any(queryUserToTrips, [user_id, trip_id])
+        .then( function(data) {
+
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              message: "Trip added!"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+        })
+        .catch(function (err){
+          console.log(err);
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              error: true,
+              message: "There was a problem adding your trip, please try again"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+        });
+      })
+        .catch(function (err){
+          console.log(err);
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              error: true,
+              message: "There was a problem adding your trip, please try again"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+          // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+        });
+      })
+    .catch(function (err){
+      console.log(err);
+          // Re-renders the page 
+          db.any(reResortQuery, [resortName])
+          .then( function(data) {
+            res.render("pages/resort",{
+              data: data,
+              error: true,
+              message: "There was a problem adding your trip, please try again"
+            })
+          })
+          .catch(function (err){
+            console.log(err);
+            res.redirect(`/resort?trip_name=${trip_name}`);
+          });
+      // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+    });
+  })
+  .catch(function (err){
+    console.log(err);
+    res.redirect(`/resort?trip_name=${trip_name}`);
+  });
 });
 
 app.post('/add-to-cart', function(req, res) {
@@ -367,6 +498,7 @@ app.get('/search', function(req, res) {
 
 
 app.use(express.static('resources'))
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
