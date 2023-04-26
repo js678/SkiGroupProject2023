@@ -230,6 +230,7 @@ app.get('/register', (req, res) => {
 //   // check if password from request matches with password in DB
 //   const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
 
+<<<<<<< Updated upstream
 //   db.tx(async (t) => {
 //     return await t.one(
 //       userQuery
@@ -262,8 +263,71 @@ app.get('/register', (req, res) => {
 //     console.log(error);
 //     // res.redirect('/register');
 //   });
+=======
+  db.tx(async (t) => {
+    return await t.one(
+      userQuery
+    );
+  })
+  .then(async (user) => {
+    const match = await bcrypt.compare(req.body.password, user.password);
+    //save user details in session 
+    if (!match) {
+      throw new Error(`Incorrect username or password`);
+    } else {
+      user.user_id = data[0].user_id;
+      user.email = data.email;
+      req.session.user = user;
+      req.session.save();
+      
+      // Authentication Middleware.
+      const auth = (req, res, next) => {
+        if (!req.session.user) {
+          // Default to login page.
+          return res.redirect('/login');
+        }
+        next();
+      };
+
+      // Authentication Required
+      app.use(auth);
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+    res.redirect('/register');
+  });
+});
+>>>>>>> Stashed changes
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+<<<<<<< Updated upstream
+=======
+  const createUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING user_id;`;
+
+  db.one(createUserQuery, [username, hashedPassword])
+    .then(user => {
+      // Save user details in session 
+      req.session.user = {
+        user_id: user.user_id,
+        username: username
+      };
+      req.session.save();
+      
+      // Redirect to home page
+      res.redirect('/home');
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Error creating new user');
+    });
+});
 
 
+>>>>>>> Stashed changes
 app.get('/home', (req,res) => {
   res.render('pages/home');
 });
@@ -367,6 +431,7 @@ app.get('/search', function(req, res) {
 
 
 app.use(express.static('resources'))
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
