@@ -31,3 +31,11 @@ body{
     font-family: "Courier New", Courier, monospace;
     color: white
 }
+
+.video {
+    pointer-events: none;
+}
+
+.HTML-Embed {
+    pointer-events: none;
+}

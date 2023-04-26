@@ -363,6 +363,9 @@ app.get('/search', function(req, res) {
       console.log(error);
     });
 });
+
+app.use(express.static('resources'))
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
