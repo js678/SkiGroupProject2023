@@ -226,44 +226,10 @@ app.get('/register', (req, res) => {
 });
 
 // Login submission
-// app.post('/login', async (req,res) => {
-//   // check if password from request matches with password in DB
-//   const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
+app.post('/login', async (req,res) => {
+  // check if password from request matches with password in DB
+  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
 
-<<<<<<< Updated upstream
-//   db.tx(async (t) => {
-//     return await t.one(
-//       userQuery
-//     );
-//   })
-//   .then(async (user) => {
-//     const match = await bcrypt.compare(req.body.password, user.password);
-//     //save user details in session like in lab 8
-//     if (!match) {
-//       res.send({message: "Invalid input"});
-//     } else {
-//       // req.session.user = user;
-//       // req.session.save();
-//       // res.redirect('/discover')
-//       // Authentication Middleware.
-//       //const auth = (req, res, next) => {
-//         // if (!req.session.user) {
-//         //   // Default to login page.
-//         //   //return res.redirect('/login');
-//         // }
-//         res.send({message: "Success"});
-//         next();
-//       };
-
-//       // Authentication Required
-//       app.use(auth);
-//     });
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//     // res.redirect('/register');
-//   });
-=======
   db.tx(async (t) => {
     return await t.one(
       userQuery
@@ -298,14 +264,11 @@ app.get('/register', (req, res) => {
     res.redirect('/register');
   });
 });
->>>>>>> Stashed changes
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-<<<<<<< Updated upstream
-=======
   const createUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING user_id;`;
 
   db.one(createUserQuery, [username, hashedPassword])
@@ -327,7 +290,6 @@ app.post('/register', async (req, res) => {
 });
 
 
->>>>>>> Stashed changes
 app.get('/home', (req,res) => {
   res.render('pages/home');
 });
