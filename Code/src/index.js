@@ -68,7 +68,7 @@ const user = {
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 app.get('/', (req, res) => {
-  res.redirect('/profile');
+  res.redirect('/home');
 });
 // TODO - Include your API routes here
 // app.get('/welcome', (req, res) => {
@@ -273,11 +273,24 @@ app.get("/logout", (req, res) => {
   res.render("pages/login");
 
 });
-app.get("/trips", (req, res)=>{
-  res.render("pages/trips");
+app.get("/trips", (req, res) => {
+  const query = " SELECT * FROM trips";
+  db.any(query)
+  .then((trips)=>{
+    res.render("pages/trips",{
+    trips,
+   });
+  })
+  .catch((err) => {
+    res.render("pages/trips", {
+      trips: [],
+      error: true,
+      message: err.message,
+    });
+  });
 })
-app.post("/login", async (req, res) => {
-  res.redirect("/resort");
+app.post("/trips", async (req, res)=>{
+  res.redirect('/resort')
 })
 
 // Make axios resort view call to see specifics of the ski resort
@@ -316,6 +329,41 @@ app.post("/resort/add", async (req, res) => {
 
 });
 
+app.post('/add-to-cart', function(req, res) {
+  const productId = req.body.productId;
+  db.none('INSERT INTO cart_items (product_id) VALUES ($1)', [productId])
+    .then(function() {
+      res.sendStatus(200);
+    })
+    .catch(function(error) {
+      console.log(error);
+      res.sendStatus(500);
+    });
+});
+
+app.get('/products', function(req, res) {
+  db.any('SELECT * FROM products')
+    .then(function(data) {
+      res.render('pages/product', { products: data });
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+
+
+app.get('/search', function(req, res) {
+  const query = req.query.query; // Get the search query from the URL query string
+  db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
+    .then(function(data) {
+      res.render('pages/search', { results: data }); // Render the search page
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+
+
 
 
 app.get('/search', function(req, res) {
@@ -328,6 +376,9 @@ app.get('/search', function(req, res) {
       console.log(error);
     });
 });
+
+app.use(express.static('resources'))
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
