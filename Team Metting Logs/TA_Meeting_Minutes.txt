@@ -33,3 +33,10 @@ Should have all of the functionality done before the next TA meeting
 Clean up the project board
 Should be finishing up the tasks from last week and moving on to other tasks
 Will talk about pages, page layout, what is going on with each group member during recitation
+
+4/26/2023:
+Have to merge all branches into main before lab NO MATTER WHAT
+Then move on to styling and making new branches
+Make sure everything is functional before styling and presentation and reports
+Meeting with TA on Monday or Tuesday to go over presentation and last minute details
+Reach out to TA over email about times that would work for the next meeting
