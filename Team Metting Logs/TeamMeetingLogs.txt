@@ -1,0 +1,34 @@
+4/13/2023:
+Find ski api’s and google api over the weekend
+If no api’s are found by Monday, email the TA
+
+Work on database
+Need a user id table that connects to a past trips table
+User table → username, password, email, user_id, 
+Past trips table that has trip_id, location, duration of trip
+Table that connects user table and past trips table through the user_id and trips_id
+
+Trips page → hotels, maps, survey for where they want to go
+
+Past orders will be determined by api
+Meeting on Monday/Tuesday again before recitation
+
+Added more features to project board (navbar, footer, etc)
+Add filter to trips page if extra time
+
+
+
+4/18/2023:
+Ask TA about APIs
+Ask TA about Lab 11
+
+
+
+4/25/2023:
+Signed up for presentation slot at 3:15 May 3
+Discussed what we had done so far
+Looked at website so far
+Ask TA about test cases tomorrow
+Will make doc for project report
+Will work on presentation over the weekend
+Most things are finishing up and it’s just aesthetic changes and testing that needs to get done
