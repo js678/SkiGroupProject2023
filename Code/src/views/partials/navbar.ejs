@@ -1,24 +1,36 @@
 <!DOCTYPE html>
-<nav class="navbar navbar-expand-sm ">
+<link href="/css/style.css" rel="stylesheet" type="text/css">
+
+<nav class="navbar navbar-expand-sm bg-dark justify-content-between text-white">
   <ul class="navbar-nav">
-    <li class="nav-item">
-      <a class="nav-link" href="/home">Home</a>
+    <li class="nav-item my-2">
+      <a class="nav-link" href="/home">
+        <img src="/img/3.png" width="30" height="30" alt="Logo">
+      </a>
     </li>
     <li class="nav-item">
-      <form class="form-inline" action="/search" method="GET">
-        <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      <form class="form-inline my-2 my-lg-0" action="/search" method="GET">
+        <div class="form-group input-group">
+          <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </div>
       </form>
     </li>
+  </ul>
+  <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="/profile">Profile</a>
+      <a class="nav-link" href="/profile">
+        <img src="/img/download (2).png" width="30" height="30" alt="Logo">
+      </a>
+    <li class="nav-item">
+      <a class="nav-link" href="/trips">
+        Trips
+      </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="/trips">Trip</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/cart">Cart</a>
+      <a class="nav-link" href="/cart">
+        <img src="/img/images (1).png" width="30" height="30" alt="Logo">
+      </a>
     </li>
   </ul>
-  
 </nav>
