@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <link href="/css/style.css" rel="stylesheet" type="text/css">
 
-<nav class="navbar fixed-top navbar-expand-sm bg-dark">
+<nav class="navbar fixed-top navbar-expand-sm bg-dark justify-content-between">
   <ul class="navbar-nav">
-    <li class="nav-item">
+    <li class="nav-item my-2">
       <a class="nav-link" href="/home">
         <img src="../../resources/img/3.png" width="30" height="30" alt="Logo">
       </a>
     </li>
     <li class="nav-item">
-      <form class="form-inline" action="/search" method="GET">
-        <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      <form class="form-inline my-2 my-lg-0" action="/search" method="GET">
+        <div class="form-group input-group">
+          <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </div>
       </form>
     </li>
   </ul>
-  <a class="nav-link" href="/profile">
-    <img src="../../resources/img/download (2).png" width="30" height="30" alt="Logo">
-  </a>
-  <a class="nav-link" href="/trip">
-    Trips
-  </a>
-  <a class="nav-link" href="/cart">
-    <img src="../../resources/img/images (1).png" width="30" height="30" alt="Logo">
-  </a>
-  
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" href="/profile">
+        <img src="../../resources/img/download (2).png" width="30" height="30" alt="Logo">
+      </a>
+    <li class="nav-item">
+      <a class="nav-link" href="/trip">
+        Trips
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/cart">
+        <img src="../../resources/img/images (1).png" width="30" height="30" alt="Logo">
+      </a>
+    </li>
+  </ul>
 </nav>
