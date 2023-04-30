@@ -460,11 +460,12 @@ app.post("/resort/add", async (req, res) => {
   });
 });
 
-app.post('/add-to-cart', function(req, res) {
+app.post('/add-to-cart', async(req, res) =>{
   const productId = req.body.productId;
   db.none('INSERT INTO cart_items (product_id) VALUES ($1)', [productId])
-    .then(function() {
-      res.sendStatus(200);
+    .then(function(data) {
+      message = "item added";
+      res.redirect(`/products?message=${message}`)
     })
     .catch(function(error) {
       console.log(error);
@@ -473,9 +474,10 @@ app.post('/add-to-cart', function(req, res) {
 });
 
 app.get('/products', function(req, res) {
+  const message = req.query.message;
   db.any('SELECT * FROM products')
     .then(function(data) {
-      res.render('pages/product', { products: data });
+      res.render('pages/product', { products: data, message: message });
     })
     .catch(function(error) {
       console.log(error);
