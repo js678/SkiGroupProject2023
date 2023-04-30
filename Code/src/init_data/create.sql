@@ -48,5 +48,6 @@ CREATE TABLE products(
 );
 
 CREATE TABLE cart_items(
+    cart_id SERIAL PRIMARY KEY,
     product_id SMALLINT
 );
