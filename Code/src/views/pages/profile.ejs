@@ -82,6 +82,13 @@
     table {
       width: 100%;
     }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f1f1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
   </style>
   <script>
   function editData() {
@@ -110,6 +117,7 @@
       email.disabled = true;
     }
   </script>
+  <body>
   <div class="container">
     <header id="header">
       <h1 id="header1">Profile Page</h1>
@@ -147,6 +155,7 @@
       </tr>
     </table>
   </div>
+</body>
 
 
   <%- include ('../partials/footer') %>

@@ -111,14 +111,22 @@ app.post('/purchase', (req, res) => {
         query = `INSERT INTO user_to_products(user_id, product_id) VALUES ($1,$2);`;
         db.any(query, [user.user_id, item_id[0].product_id])
         .then((data) => {
-          query = `DELETE FROM cart_items WHERE cart_items.product_id = $1;`;
+          query = `select * from cart_items
+                    where product_id = $1;`
           db.any(query, [item_id[0].product_id])
-          .then((data1) => {
-            res.redirect('/cart');
+          .then((items) => {
+            query = `DELETE FROM cart_items WHERE cart_id = $1;`;
+            db.any(query, [items[0].cart_id])
+            .then((data1) => {
+              res.redirect('/cart');
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           })
           .catch((err) => {
             console.log(err);
-          });
+          })
         })
         .catch((err) => {
           console.log(err);
@@ -132,14 +140,22 @@ app.post('/purchase', (req, res) => {
               where products.name = $1;`;
     db.any(query, [name])
       .then((item_id) => {
-        query = `DELETE FROM cart_items WHERE cart_items.product_id = $1;`;
-        db.any(query, [item_id[0].product_id])
-        .then((data1) => {
-          res.redirect('/cart');
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        query = `select * from cart_items
+                    where product_id = $1;`
+          db.any(query, [item_id[0].product_id])
+          .then((items) => {
+            query = `DELETE FROM cart_items WHERE cart_id = $1;`;
+            db.any(query, [items[0].cart_id])
+            .then((data1) => {
+              res.redirect('/cart');
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          })
       })
       .catch((err) => {
         console.log(err);

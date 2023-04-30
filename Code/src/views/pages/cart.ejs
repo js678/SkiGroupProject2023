@@ -6,10 +6,12 @@
 }
 
 body {
-	margin: 0;
-	padding: 0;
-	font-family: Arial, sans-serif;
-}
+    font-family: Arial, sans-serif;
+    background-color: #f1f1f1;
+	min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
 h1 {
 	text-align: center;
@@ -70,24 +72,28 @@ h1 {
   justify-content: center;
 }
 </style>
-<h1>My Cart</h1>
-
-<%cart_data.forEach(item=> { %>
-<div class="form-center">
-    <form id="cart_form" method="POST" action="/purchase">
-        <div class="cart-item"> 
-            <img id="item_image" src=<%- item.image %>>
-            <div class="item-details">
-                <input type="hidden" name="item_name" value="<%- item.name %>"/>
-                <h2><%- item.name %></h2>
-                <a>Price: $<%- item.price %></a>
-                <p>Brand: <%- item.brand %></p>
-                <button type="submit" name="button" id="remove-button" value="remove">remove</button>
-                <button type="submit" name="button" id="purchase-button" value="add">Purchase</button>
-            </div>
-        </div>
-    </form>
-</div>
-<% }) %>
+<html>
+  
+  <body>
+	<h1>My Cart</h1>
+	<%cart_data.forEach(item=> { %>
+	<div class="form-center">
+		<form id="cart_form" method="POST" action="/purchase">
+			<div class="cart-item"> 
+				<img id="item_image" src=<%- item.image %>>
+				<div class="item-details">
+					<input type="hidden" name="item_name" value="<%- item.name %>"/>
+					<h2><%- item.name %></h2>
+					<a>Price: $<%- item.price %></a>
+					<p>Brand: <%- item.brand %></p>
+					<button type="submit" name="button" id="remove-button" value="remove">remove</button>
+					<button type="submit" name="button" id="purchase-button" value="add">Purchase</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<% }) %>
+  </body>
+</html>
 
 <%- include ('../partials/footer') %>
