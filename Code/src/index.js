@@ -461,11 +461,11 @@ app.post("/resort/add", async (req, res) => {
 });
 
 app.post('/add-to-cart', async(req, res) =>{
-  const productId = req.body.productId;
+  const productId = req.body.product_id;
   db.none('INSERT INTO cart_items (product_id) VALUES ($1)', [productId])
     .then(function(data) {
       message = "item added";
-      res.redirect(`/products?message=${message}`)
+      res.redirect(`/search?query=`)
     })
     .catch(function(error) {
       console.log(error);
