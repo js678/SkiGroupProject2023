@@ -304,7 +304,7 @@ app.get("/logout", (req, res) => {
   
 });
 app.get("/trips", (req, res) => {
-  const query = "SELECT * FROM trips ORDER BY state_ ASC;";
+  const query = "SELECT * FROM trips ORDER BY state_ ASC, trip_name ASC;";
   db.any(query)
   .then((trips)=>{
     console.log(trips)
