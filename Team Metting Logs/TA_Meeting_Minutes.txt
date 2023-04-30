@@ -1,0 +1,42 @@
+4/12/2023:
+Take notes throughout meeting
+Commits will be checked every week
+Each person responsible for their own user stories
+Work collaboratively
+
+Weekly meeting plans:
+List of features on website
+Prioritize features (p0-pn)
+Divide into two sections
+Things that have to be done
+Things that if we have extra time we will tackle them
+Assign tasks and put on project board
+Design database and api structure → minimum changes over the weeks
+Thorough databases
+End of 1st week → login, registration pages finished
+Functionality over looking nice
+
+Everyone assigned an user story to work on
+Registration page and login page - Luke
+Profile page - Conrad
+Home page - Jack
+Trips page - Parker and Xan
+Search page - Andrew
+
+
+
+4/19/2023:
+Pick up the pace
+Figure out what is going on between the different search pages
+Spend time working on the functionality before making it look pretty
+Should have all of the functionality done before the next TA meeting
+Clean up the project board
+Should be finishing up the tasks from last week and moving on to other tasks
+Will talk about pages, page layout, what is going on with each group member during recitation
+
+4/26/2023:
+Have to merge all branches into main before lab NO MATTER WHAT
+Then move on to styling and making new branches
+Make sure everything is functional before styling and presentation and reports
+Meeting with TA on Monday or Tuesday to go over presentation and last minute details
+Reach out to TA over email about times that would work for the next meeting

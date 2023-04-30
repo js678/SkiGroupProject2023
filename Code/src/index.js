@@ -72,7 +72,7 @@ const user = {
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 app.get('/', (req, res) => {
-  res.redirect('/profile');
+  res.redirect('/home');
 });
 // TODO - Include your API routes here
 // app.get('/welcome', (req, res) => {
@@ -230,42 +230,68 @@ app.get('/register', (req, res) => {
 });
 
 // Login submission
-// app.post('/login', async (req,res) => {
-//   // check if password from request matches with password in DB
-//   const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
+app.post('/login', async (req,res) => {
+  // check if password from request matches with password in DB
+  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
 
-//   db.tx(async (t) => {
-//     return await t.one(
-//       userQuery
-//     );
-//   })
-//   .then(async (user) => {
-//     const match = await bcrypt.compare(req.body.password, user.password);
-//     //save user details in session like in lab 8
-//     if (!match) {
-//       res.send({message: "Invalid input"});
-//     } else {
-//       // req.session.user = user;
-//       // req.session.save();
-//       // res.redirect('/discover')
-//       // Authentication Middleware.
-//       //const auth = (req, res, next) => {
-//         // if (!req.session.user) {
-//         //   // Default to login page.
-//         //   //return res.redirect('/login');
-//         // }
-//         res.send({message: "Success"});
-//         next();
-//       };
+  db.tx(async (t) => {
+    return await t.one(
+      userQuery
+    );
+  })
+  .then(async (user) => {
+    const match = await bcrypt.compare(req.body.password, user.password);
+    //save user details in session 
+    if (!match) {
+      throw new Error(`Incorrect username or password`);
+    } else {
+      user.user_id = data[0].user_id;
+      user.email = data.email;
+      req.session.user = user;
+      req.session.save();
+      
+      // Authentication Middleware.
+      const auth = (req, res, next) => {
+        if (!req.session.user) {
+          // Default to login page.
+          return res.redirect('/login');
+        }
+        next();
+      };
 
-//       // Authentication Required
-//       app.use(auth);
-//     });
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//     // res.redirect('/register');
-//   });
+      // Authentication Required
+      app.use(auth);
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+    res.redirect('/register');
+  });
+});
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const createUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING user_id;`;
+
+  db.one(createUserQuery, [username, hashedPassword])
+    .then(user => {
+      // Save user details in session 
+      req.session.user = {
+        user_id: user.user_id,
+        username: username
+      };
+      req.session.save();
+      
+      // Redirect to home page
+      res.redirect('/home');
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Error creating new user');
+    });
+});
 
 
 app.get('/home', (req,res) => {
@@ -434,18 +460,46 @@ app.post("/resort/add", async (req, res) => {
   });
 });
 
+app.post('/add-to-cart', function(req, res) {
+  const productId = req.body.productId;
+  db.none('INSERT INTO cart_items (product_id) VALUES ($1)', [productId])
+    .then(function() {
+      res.sendStatus(200);
+    })
+    .catch(function(error) {
+      console.log(error);
+      res.sendStatus(500);
+    });
+});
+
+app.get('/products', function(req, res) {
+  db.any('SELECT * FROM products')
+    .then(function(data) {
+      res.render('pages/product', { products: data });
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
 
 
 app.get('/search', function(req, res) {
   const query = req.query.query; // Get the search query from the URL query string
   db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
     .then(function(data) {
-      res.render('pages/search', { results: data }); // Render the search template with the search results
+      res.render('pages/search', { results: data }); // Render the search page
     })
     .catch(function(error) {
       console.log(error);
     });
 });
+
+
+
+
+app.use(express.static('resources'))
+
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
