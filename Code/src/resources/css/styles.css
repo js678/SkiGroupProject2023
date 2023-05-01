@@ -39,3 +39,5 @@ body{
 .HTML-Embed {
     pointer-events: none;
 }
+
+body { padding-top: 1000px; }
