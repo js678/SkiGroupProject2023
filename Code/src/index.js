@@ -79,6 +79,68 @@ app.get('/', (req, res) => {
 //   res.json({ status: 'success', message: 'Welcome!' });
 // });
 
+app.get('/login', (req, res) => {
+  res.render('pages/login')
+});
+
+app.get('/register', (req, res) => {
+  res.render('pages/register')
+});
+
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Find user from database
+    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
+
+    if (!user) {
+      // User not found
+      // send message
+      res.redirect('/register');
+    } else {
+      // Check if password is correct
+      const match = await bcrypt.compare(password, user.password);
+         
+      if (match) {
+        
+        req.session.user = user;
+        req.session.save();
+
+        res.redirect('/home');
+      } else {
+        throw new Error('Incorrect username or password.');
+      }
+    }
+  } catch (error) {
+    // Handle error
+    console.error(error);
+    res.render('pages/login', { error: 'An error occurred. Please try again.' });
+  }
+});
+
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  // const email = req.body.email;
+
+  const hash = await bcrypt.hash(password, 10);
+
+  try {
+    const query = 'INSERT INTO users (username, password) VALUES ($1, $2)';
+    await db.any(query, [username, hash]);
+    
+    //const query2 = 'INSERT INTO users (email) VALUES ($1)';
+    //await db.any(query2, [email]);
+
+    res.redirect('/home');
+  } catch (error) {
+    console.error(error);
+    console.error("User not added");
+    res.redirect('/register');
+  }
+})
+
 app.get('/cart', (req, res) => {
   const query = `select * from products
                 left join cart_items
@@ -237,6 +299,7 @@ app.post('/update-profile', (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
 app.get('/login', (req, res) => {
   res.render('pages/login')
 });
@@ -310,14 +373,21 @@ app.post('/register', async (req, res) => {
 });
 
 
+=======
+>>>>>>> Stashed changes
 app.get('/home', (req,res) => {
   res.render('pages/home');
 });
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
+<<<<<<< Updated upstream
   res.render("pages/login");
   
+=======
+  res.render("pages/logout");
+
+>>>>>>> Stashed changes
 });
 app.get("/trips", (req, res) => {
   const query = "SELECT * FROM trips ORDER BY state_ ASC;";
