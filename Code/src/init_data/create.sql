@@ -11,6 +11,7 @@ CREATE TABLE user_to_trips(
 );
 
 CREATE TABLE past_trips(
+    past_trip_id SERIAL PRIMARY KEY,
     trip_id SMALLINT,
     link VARCHAR(200) NOT NULL,
     location VARCHAR(50) NOT NULL,

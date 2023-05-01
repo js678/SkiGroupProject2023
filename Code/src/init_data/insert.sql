@@ -1,6 +1,3 @@
-INSERT INTO users(username, email, password) VALUES ('bob', 'billy@gmail.com', 'asdasd');
-
-
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Ski','829.99','K2','Dispatch 101', 'https://content.backcountry.com/images/items/900/K2S/K2SO0KS/ONECOL.jpg');
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Ski','899.99','K2','Dispatch 110', 'https://content.backcountry.com/images/items/900/K2S/K2SO0KT/ONECOL.jpg');
 INSERT INTO products(product_type, price, brand, name, image) VALUES ('Ski','449.99','Volkl','Revolt 95', 'https://content.backcountry.com/images/items/900/VKL/VKLI074/ONECOL.jpg');

@@ -33,19 +33,6 @@
     border-radius: 5px 0 0 5px;
   }
 
-  .btn {
-    border: 1px solid #007bff;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 0 5px 5px 0;
-    cursor: pointer;
-  }
-
-  .btn:hover {
-    background-color: #0069d9;
-  }
-
   table {
     border-collapse: collapse;
     margin: 50px auto;
@@ -75,17 +62,18 @@
     height: auto;
   }
 
-  button[type="submit"] {
+  #button1 {
+    border: 1px solid #007bff;
     background-color: #007bff;
     color: white;
-    border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 0 5px 5px 0;
     cursor: pointer;
   }
 
-  button[type="submit"]:hover {
+  #button1:hover {
     background-color: #0069d9;
+    
   }
 
   .results {
@@ -101,7 +89,7 @@
     <form class="form-inline my-2 my-lg-0" action="/search" method="GET">
       <div class="form-group input-group">
         <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <button id="button1" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
       </div>
     </form>
 
@@ -126,7 +114,7 @@
             <td><img src="<%= results.image %>" width="400px" height="400px" /></td>
             <td><form action="/add-to-cart" method="post">
               <input type="hidden" name="product_id" value="<%= results.product_id %>">
-              <button type="submit">Add to Cart</button>
+              <button id="button1" type="submit">Add to Cart</button>
             </form>
           </td>
           </tr>

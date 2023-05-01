@@ -141,7 +141,7 @@
         <td>
           <% %>
             <% var i=1; trip_data.forEach(item=> { %>
-              <li>[Trip <%- i %>] - <a href=<%- item.link %>>[Trip link]</a> - <%- item.location %> - <%-item.duration
+              <li>[Trip <%- i %>] - <a href=<%- item.link %> target="_blank" rel="noopener noreferrer">[Trip link]</a> - <%- item.location %> - <%-item.duration
                       %> days</li>
               <%i++; }) %>
         </td>

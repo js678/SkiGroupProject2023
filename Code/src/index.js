@@ -63,7 +63,7 @@ app.use(
 );
 
 const user = {
-  user_id: 1,
+  user_id: undefined,
   username: undefined,
   password: undefined,
   email: undefined,
@@ -79,6 +79,8 @@ app.get('/', (req, res) => {
 //   res.json({ status: 'success', message: 'Welcome!' });
 // });
 
+
+
 app.get('/login', (req, res) => {
   res.render('pages/login')
 });
@@ -87,59 +89,60 @@ app.get('/register', (req, res) => {
   res.render('pages/register')
 });
 
+
+
+// Login submission
 app.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  const query = "SELECT * FROM users where username = $1;";
+  const values = [req.body.username];
 
-    // Find user from database
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
-
-    if (!user) {
-      // User not found
-      // send message
-      res.redirect('/register');
-    } else {
-      // Check if password is correct
-      const match = await bcrypt.compare(password, user.password);
-         
-      if (match) {
-        
+  // get the student_id based on the emailid
+  db.one(query, values)
+    .then(async (data) => {
+      const match = await bcrypt.compare(req.body.password, data.password);
+      if (!match)
+        throw 'Incorrect username or password.';
+      else {
+        user.username = req.body.username;
+        user.password = data.password;
+        user.email = data.email;
+        user.user_id = data.user_id;
         req.session.user = user;
         req.session.save();
 
-        res.redirect('/home');
-      } else {
-        throw new Error('Incorrect username or password.');
+        res.redirect("/home");
       }
-    }
-  } catch (error) {
-    // Handle error
-    console.error(error);
-    res.render('pages/login', { error: 'An error occurred. Please try again.' });
-  }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.redirect("/register");
+    });
 });
 
-
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  // const email = req.body.email;
+  const hash = await bcrypt.hash(req.body.password, 10);
+  const query = "INSERT INTO users(username, email, password) VALUES ($1, $2, $3);";
+  db.any(query, [req.body.username, req.body.email, hash])
+    .then((user_data) => {
+      console.log("hi");
+      res.redirect("/login");
+    })
+    .catch((err) => {
+      res.redirect("/register");
+      return console.log(err);
+    });
+});
 
-  const hash = await bcrypt.hash(password, 10);
-
-  try {
-    const query = 'INSERT INTO users (username, password) VALUES ($1, $2)';
-    await db.any(query, [username, hash]);
-    
-    //const query2 = 'INSERT INTO users (email) VALUES ($1)';
-    //await db.any(query2, [email]);
-
-    res.redirect('/home');
-  } catch (error) {
-    console.error(error);
-    console.error("User not added");
-    res.redirect('/register');
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
   }
-})
+  next();
+};
+app.use(express.static('resources'))
+// Authentication Required
+app.use(auth);
 
 app.get('/cart', (req, res) => {
   const query = `select * from products
@@ -165,55 +168,55 @@ app.get('/cart', (req, res) => {
 app.post('/purchase', (req, res) => {
   const name = req.body.item_name;
   const button = req.body.button;
-  if(button == "add"){
+  if (button == "add") {
     query = `select * from products
               where products.name = $1;`;
     db.any(query, [name])
       .then((item_id) => {
         query = `INSERT INTO user_to_products(user_id, product_id) VALUES ($1,$2);`;
         db.any(query, [user.user_id, item_id[0].product_id])
-        .then((data) => {
-          query = `select * from cart_items
+          .then((data) => {
+            query = `select * from cart_items
                     where product_id = $1;`
-          db.any(query, [item_id[0].product_id])
-          .then((items) => {
-            query = `DELETE FROM cart_items WHERE cart_id = $1;`;
-            db.any(query, [items[0].cart_id])
-            .then((data1) => {
-              res.redirect('/cart');
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+            db.any(query, [item_id[0].product_id])
+              .then((items) => {
+                query = `DELETE FROM cart_items WHERE cart_id = $1;`;
+                db.any(query, [items[0].cart_id])
+                  .then((data1) => {
+                    res.redirect('/cart');
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              })
+              .catch((err) => {
+                console.log(err);
+              })
           })
           .catch((err) => {
             console.log(err);
-          })
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+          });
       })
       .catch((err) => {
         console.log(err);
       });
-  }else {
+  } else {
     query = `select * from products
               where products.name = $1;`;
     db.any(query, [name])
       .then((item_id) => {
         query = `select * from cart_items
                     where product_id = $1;`
-          db.any(query, [item_id[0].product_id])
+        db.any(query, [item_id[0].product_id])
           .then((items) => {
             query = `DELETE FROM cart_items WHERE cart_id = $1;`;
             db.any(query, [items[0].cart_id])
-            .then((data1) => {
-              res.redirect('/cart');
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+              .then((data1) => {
+                res.redirect('/cart');
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           })
           .catch((err) => {
             console.log(err);
@@ -236,6 +239,7 @@ app.get('/profile', (req, res) => {
                        where user_to_trips.user_id = $1;`;
       db.any(query, [user.user_id])
         .then((trip_data) => {
+          console.log(trip_data);
           const query = `select * from products 
                             left join user_to_products
                             on products.product_id = user_to_products.product_id
@@ -299,124 +303,40 @@ app.post('/update-profile', (req, res) => {
   }
 });
 
-<<<<<<< Updated upstream
-app.get('/login', (req, res) => {
-  res.render('pages/login')
-});
-
-app.get('/register', (req, res) => {
-  res.render('pages/register')
-});
-
-// Login submission
-app.post('/login', async (req,res) => {
-  // check if password from request matches with password in DB
-  const userQuery = `SELECT * FROM users WHERE username = '${req.body.username}';`;
-
-  db.tx(async (t) => {
-    return await t.one(
-      userQuery
-    );
-  })
-  .then(async (user) => {
-    const match = await bcrypt.compare(req.body.password, user.password);
-    //save user details in session 
-    if (!match) {
-      throw new Error(`Incorrect username or password`);
-    } else {
-      user.user_id = data[0].user_id;
-      user.email = data.email;
-      req.session.user = user;
-      req.session.save();
-      
-      // Authentication Middleware.
-      const auth = (req, res, next) => {
-        if (!req.session.user) {
-          // Default to login page.
-          return res.redirect('/login');
-        }
-        next();
-      };
-
-      // Authentication Required
-      app.use(auth);
-    }
-  })
-  .catch((err) => {
-    console.log(err);
-    res.redirect('/register');
-  });
-});
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const createUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING user_id;`;
-
-  db.one(createUserQuery, [username, hashedPassword])
-    .then(user => {
-      // Save user details in session 
-      req.session.user = {
-        user_id: user.user_id,
-        username: username
-      };
-      req.session.save();
-      
-      // Redirect to home page
-      res.redirect('/home');
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).send('Error creating new user');
-    });
-});
-
-
-=======
->>>>>>> Stashed changes
-app.get('/home', (req,res) => {
+app.get('/home', (req, res) => {
   res.render('pages/home');
 });
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
-<<<<<<< Updated upstream
   res.render("pages/login");
-  
-=======
-  res.render("pages/logout");
 
->>>>>>> Stashed changes
 });
 app.get("/trips", (req, res) => {
   const query = "SELECT * FROM trips ORDER BY state_ ASC;";
   db.any(query)
-  .then((trips)=>{
-    console.log(trips)
-    res.render("pages/trips",{
-    trips,
-   });
-  })
-  .catch((err) => {
-    res.render("pages/trips", {
-      trips: [],
-      error: true,
-      message: err.message,
+    .then((trips) => {
+      res.render("pages/trips", {
+        trips,
+      });
+    })
+    .catch((err) => {
+      res.render("pages/trips", {
+        trips: [],
+        error: true,
+        message: err.message,
+      });
     });
-  });
 
 
 });
-app.post("/trips", (req, res)=>{
+app.post("/trips", (req, res) => {
   res.redirect("pages/resort");
 })
 app.post("/login", async (req, res) => {
   res.redirect("/resort");
 
 })
-
-
 
 // Renders the resort page with the information from the trips database
 app.get("/resort", (req, res) => {
@@ -427,22 +347,22 @@ app.get("/resort", (req, res) => {
 
   // Gets all of the data from the trips table for the specific resort
   db.any(resortQuery, [resortName])
-  .then(function(data){
-    res.render("pages/resort", {
-      status: 201,
-      data: data,
+    .then(function (data) {
+      res.render("pages/resort", {
+        status: 201,
+        data: data,
+      });
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.redirect("/trips");
     });
-  })
-  .catch(function(err){
-    console.log(err);
-    res.redirect("/trips");
-  });
 
 });
 
 // Adds the trip to the past trips table
 app.post("/resort/add", async (req, res) => {
-  
+
   // Gets data from the form
   duration = req.body.duration;
   resortName = req.body.trip_name;
@@ -456,128 +376,126 @@ app.post("/resort/add", async (req, res) => {
 
   // Gets the trip_id
   db.any(tripIdQuery, [resortName])
-  .then(function(data){
-
-    const trip_id = data[0]["trip_id"];
-
-    // Inserts into past trips table
-    db.any(queryPastTrips, [trip_id, link, resortName, duration])
     .then(function (data) {
 
-      // Find user in user's table
-      db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
-      .then( function(data) {
+      const trip_id = data[0]["trip_id"];
 
-        const user_id = data[0]["user_id"];
+      // Inserts into past trips table
+      db.one(queryPastTrips, [trip_id, link, resortName, duration])
+        .then(function (data) {
+          // Find user in user's table
+          db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
+            .then(function (data) {
 
-        // Connects past trips to the user's account
-        db.any(queryUserToTrips, [user_id, trip_id])
-        .then( function(data) {
+              const user_id = data[0]["user_id"];
 
-          // Re-renders the page 
-          db.any(reResortQuery, [resortName])
-          .then( function(data) {
-            res.render("pages/resort",{
-              data: data,
-              message: "Trip added!"
+              // Connects past trips to the user's account
+              db.one(queryUserToTrips, [user_id, trip_id])
+                .then(function (data) {
+                  // Re-renders the page 
+                  db.any(reResortQuery, [resortName])
+                    .then(function (data) {
+                      res.render("pages/resort", {
+                        data: data,
+                        message: "Trip added!"
+                      })
+                    })
+                    .catch(function (err) {
+                      console.log(err);
+                      res.redirect(`/resort?trip_name=${trip_name}`);
+                    });
+                })
+                .catch(function (err) {
+                  console.log(err);
+                  // Re-renders the page 
+                  db.any(reResortQuery, [resortName])
+                    .then(function (data) {
+                      res.render("pages/resort", {
+                        data: data,
+                        error: true,
+                        message: "There was a problem adding your trip, please try again"
+                      })
+                    })
+                    .catch(function (err) {
+                      console.log(err);
+                      res.redirect(`/resort?trip_name=${trip_name}`);
+                    });
+                });
             })
-          })
-          .catch(function (err){
-            console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
-          });
+            .catch(function (err) {
+              console.log(err);
+              // Re-renders the page 
+              db.any(reResortQuery, [resortName])
+                .then(function (data) {
+                  res.render("pages/resort", {
+                    data: data,
+                    error: true,
+                    message: "There was a problem adding your trip, please try again"
+                  })
+                })
+                .catch(function (err) {
+                  console.log(err);
+                  res.redirect(`/resort?trip_name=${trip_name}`);
+                });
+              // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+            });
         })
-        .catch(function (err){
+        .catch(function (err) {
           console.log(err);
           // Re-renders the page 
           db.any(reResortQuery, [resortName])
-          .then( function(data) {
-            res.render("pages/resort",{
-              data: data,
-              error: true,
-              message: "There was a problem adding your trip, please try again"
+            .then(function (data) {
+              res.render("pages/resort", {
+                data: data,
+                error: true,
+                message: "There was a problem adding your trip, please try again"
+              })
             })
-          })
-          .catch(function (err){
-            console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
-          });
-        });
-      })
-        .catch(function (err){
-          console.log(err);
-          // Re-renders the page 
-          db.any(reResortQuery, [resortName])
-          .then( function(data) {
-            res.render("pages/resort",{
-              data: data,
-              error: true,
-              message: "There was a problem adding your trip, please try again"
-            })
-          })
-          .catch(function (err){
-            console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
-          });
+            .catch(function (err) {
+              console.log(err);
+              res.redirect(`/resort?trip_name=${trip_name}`);
+            });
           // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
         });
-      })
-    .catch(function (err){
+    })
+    .catch(function (err) {
       console.log(err);
-          // Re-renders the page 
-          db.any(reResortQuery, [resortName])
-          .then( function(data) {
-            res.render("pages/resort",{
-              data: data,
-              error: true,
-              message: "There was a problem adding your trip, please try again"
-            })
-          })
-          .catch(function (err){
-            console.log(err);
-            res.redirect(`/resort?trip_name=${trip_name}`);
-          });
-      // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+      res.redirect(`/resort?trip_name=${trip_name}`);
     });
-  })
-  .catch(function (err){
-    console.log(err);
-    res.redirect(`/resort?trip_name=${trip_name}`);
-  });
 });
 
-app.post('/add-to-cart', async(req, res) =>{
+app.post('/add-to-cart', async (req, res) => {
   const productId = req.body.product_id;
   db.none('INSERT INTO cart_items (product_id) VALUES ($1)', [productId])
-    .then(function(data) {
+    .then(function (data) {
       message = "item added";
       res.redirect(`/search?query=`)
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
       res.sendStatus(500);
     });
 });
 
-app.get('/products', function(req, res) {
+app.get('/products', function (req, res) {
   const message = req.query.message;
   db.any('SELECT * FROM products')
-    .then(function(data) {
+    .then(function (data) {
       res.render('pages/product', { products: data, message: message });
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 });
 
 
-app.get('/search', function(req, res) {
+app.get('/search', function (req, res) {
   const query = req.query.query; // Get the search query from the URL query string
   db.any(`SELECT * FROM products WHERE name ILIKE '%${query}%' OR product_type ILIKE '%${query}%'`) // Use ILIKE to perform a case-insensitive search
-    .then(function(data) {
+    .then(function (data) {
       res.render('pages/search', { results: data }); // Render the search page
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 });
@@ -585,7 +503,7 @@ app.get('/search', function(req, res) {
 
 
 
-app.use(express.static('resources'))
+
 
 
 // *****************************************************
