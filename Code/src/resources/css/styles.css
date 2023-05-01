@@ -5,6 +5,7 @@ body{
     display: grid;
     place-items: center center;
     font-family: 'Poppins', sans-serif;
+    padding-top: 110px;
 }
 
 .centered{
@@ -39,5 +40,3 @@ body{
 .HTML-Embed {
     pointer-events: none;
 }
-
-body { padding-top: 1000px; }
