@@ -106,13 +106,13 @@ app.post('/login', async (req, res) => {
         req.session.user = user;
         req.session.save();
         res.json({status: 'success', message: 'Success'});
-        //res.redirect("/home");
+        // res.redirect("/home");
       }
     })
     .catch((err) => {
       console.log(err);
       res.json({status: 'success', message: 'Invalid input'});
-      //res.redirect("/register");
+      // res.redirect("/register");
     });
 });
 
@@ -131,22 +131,22 @@ app.post('/register', async (req, res) => {
         db.any(query, [req.body.username, req.body.email, hash])
         .then((user_data) => {
           res.json({status: 'success', message: 'Success'});
-          //res.redirect("/login");
+          // res.redirect("/login");
         })
         .catch((err) => {
           res.json({status: 'success', message: 'Username already exist'});
-          //res.redirect("/register");
+          // res.redirect("/register");
           return console.log(err);
         });
       }
     })
     .catch((err) => {
-      res.json({status: 'success', message: 'Username already exist'});
+      // res.json({status: 'success', message: 'Username already exist'});
       console.log("hi)");
-      // res.render("pages/register", {
-      //   error: true,
-      //   message: err.message,
-      // });
+      res.render("pages/register", {
+        error: true,
+        message: err.message,
+      });
       return console.log(err);
     });
 });
@@ -358,10 +358,20 @@ app.post("/login", async (req, res) => {
 
 // Renders the resort page with the information from the trips database
 app.get("/resort", (req, res) => {
-
   // Variables for the query
   const resortName = req.query.trip_name;
+  const tripAdd = req.query.added;
   const resortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
+  var message = "";
+
+  if(tripAdd == "success")
+  {
+    message = "Trip added!";
+  }
+  else if(tripAdd == "failed")
+  {
+    message = "There was a problem adding your trip, please try again";
+  }
 
   // Gets all of the data from the trips table for the specific resort
   db.any(resortQuery, [resortName])
@@ -369,6 +379,7 @@ app.get("/resort", (req, res) => {
       res.render("pages/resort", {
         status: 201,
         data: data,
+        message: message
       });
     })
     .catch(function (err) {
@@ -390,7 +401,6 @@ app.post("/resort/add", async (req, res) => {
   const tripIdQuery = `SELECT trip_id FROM trips WHERE trip_name = $1;`;
   const queryPastTrips = `INSERT INTO past_trips(trip_id, link, location, duration) VALUES ($1, $2, $3, $4) returning *;`;
   const queryUserToTrips = `INSERT INTO user_to_trips(user_id, trip_id) VALUES ($1, $2) returning *;`;
-  const reResortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
 
   // Gets the trip_id
   db.any(tripIdQuery, [resortName])
@@ -410,76 +420,30 @@ app.post("/resort/add", async (req, res) => {
               // Connects past trips to the user's account
               db.one(queryUserToTrips, [user_id, trip_id])
                 .then(function (data) {
-                  // Re-renders the page 
-                  db.any(reResortQuery, [resortName])
-                    .then(function (data) {
-                      res.render("pages/resort", {
-                        data: data,
-                        message: "Trip added!"
-                      })
-                    })
-                    .catch(function (err) {
-                      console.log(err);
-                      res.redirect(`/resort?trip_name=${trip_name}`);
-                    });
+                  res.redirect(`/resort?trip_name=${resortName}&added=success`);
                 })
                 .catch(function (err) {
                   console.log(err);
-                  // Re-renders the page 
-                  db.any(reResortQuery, [resortName])
-                    .then(function (data) {
-                      res.render("pages/resort", {
-                        data: data,
-                        error: true,
-                        message: "There was a problem adding your trip, please try again"
-                      })
-                    })
-                    .catch(function (err) {
-                      console.log(err);
-                      res.redirect(`/resort?trip_name=${trip_name}`);
-                    });
+                  res.redirect(`/resort?trip_name=${resortName}&added=failed`);
                 });
             })
             .catch(function (err) {
               console.log(err);
               // Re-renders the page 
-              db.any(reResortQuery, [resortName])
-                .then(function (data) {
-                  res.render("pages/resort", {
-                    data: data,
-                    error: true,
-                    message: "There was a problem adding your trip, please try again"
-                  })
-                })
-                .catch(function (err) {
-                  console.log(err);
-                  res.redirect(`/resort?trip_name=${trip_name}`);
-                });
-              // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+              res.redirect(`/resort?trip_name=${resortName}&added=failed`);
             });
         })
         .catch(function (err) {
           console.log(err);
           // Re-renders the page 
-          db.any(reResortQuery, [resortName])
-            .then(function (data) {
-              res.render("pages/resort", {
-                data: data,
-                error: true,
-                message: "There was a problem adding your trip, please try again"
-              })
-            })
-            .catch(function (err) {
-              console.log(err);
-              res.redirect(`/resort?trip_name=${trip_name}`);
-            });
-          // res.redirect(`/resort?trip_name=${trip_name}&added=failed`);
+          res.redirect(`/resort?trip_name=${resortName}&added=failed`);
         });
     })
     .catch(function (err) {
       console.log(err);
-      res.redirect(`/resort?trip_name=${trip_name}`);
+      res.redirect(`/resort?trip_name=${resortName}&added=failed`);
     });
+
 });
 
 app.post('/add-to-cart', async (req, res) => {
