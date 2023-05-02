@@ -75,10 +75,6 @@ app.get('/', (req, res) => {
   res.redirect('/home');
 });
 // TODO - Include your API routes here
-// app.get('/welcome', (req, res) => {
-//   res.json({ status: 'success', message: 'Welcome!' });
-// });
-
 
 
 app.get('/login', (req, res) => {
@@ -109,26 +105,48 @@ app.post('/login', async (req, res) => {
         user.user_id = data.user_id;
         req.session.user = user;
         req.session.save();
-
-        res.redirect("/home");
+        res.json({status: 'success', message: 'Success'});
+        //res.redirect("/home");
       }
     })
     .catch((err) => {
       console.log(err);
-      res.redirect("/register");
+      res.json({status: 'success', message: 'Invalid input'});
+      //res.redirect("/register");
     });
 });
 
 app.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(req.body.password, 10);
-  const query = "INSERT INTO users(username, email, password) VALUES ($1, $2, $3);";
-  db.any(query, [req.body.username, req.body.email, hash])
-    .then((user_data) => {
-      console.log("hi");
-      res.redirect("/login");
+  const query = "SELECT * FROM users where username = $1;";
+  const values = [req.body.username];
+  
+  db.any(query, values)
+    .then((users) => {
+      console.log(users.length);
+      if(users.length >= 1)
+        throw new Error('Username already exist');
+      else{
+        const query = "INSERT INTO users(username, email, password) VALUES ($1, $2, $3);";
+        db.any(query, [req.body.username, req.body.email, hash])
+        .then((user_data) => {
+          res.json({status: 'success', message: 'Success'});
+          //res.redirect("/login");
+        })
+        .catch((err) => {
+          res.json({status: 'success', message: 'Username already exist'});
+          //res.redirect("/register");
+          return console.log(err);
+        });
+      }
     })
     .catch((err) => {
-      res.redirect("/register");
+      res.json({status: 'success', message: 'Username already exist'});
+      console.log("hi)");
+      // res.render("pages/register", {
+      //   error: true,
+      //   message: err.message,
+      // });
       return console.log(err);
     });
 });

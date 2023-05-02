@@ -61,6 +61,15 @@
 <main>
   <body>
      <div class="form">
+        <% if (locals.message) { %>
+          <div
+            class="alert alert-<%- locals.error ? 'danger' : 'success' %>"
+            role="alert"
+            style="margin-top: 10px;"
+          >
+            <%= message %>
+          </div>
+        <% } %>
        <h1 align="center">Register </h1>
        <form action="/register" method="POST" align="center">
     
