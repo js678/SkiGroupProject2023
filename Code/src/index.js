@@ -105,14 +105,14 @@ app.post('/login', async (req, res) => {
         user.user_id = data.user_id;
         req.session.user = user;
         req.session.save();
-        res.json({status: 'success', message: 'Success'});
-        // res.redirect("/home");
+        //res.json({status: 'success', message: 'Success'});
+        res.redirect("/home");
       }
     })
     .catch((err) => {
       console.log(err);
-      res.json({status: 'success', message: 'Invalid input'});
-      // res.redirect("/register");
+      //res.json({status: 'success', message: 'Invalid input'});
+      res.redirect("/register");
     });
 });
 
@@ -130,22 +130,22 @@ app.post('/register', async (req, res) => {
         const query = "INSERT INTO users(username, email, password) VALUES ($1, $2, $3);";
         db.any(query, [req.body.username, req.body.email, hash])
         .then((user_data) => {
-          res.json({status: 'success', message: 'Success'});
-          // res.redirect("/login");
+          //res.json({status: 'success', message: 'Success'});
+          res.redirect("/login");
         })
         .catch((err) => {
-          res.json({status: 'success', message: 'Username already exist'});
-          // res.redirect("/register");
+          //res.json({status: 'success', message: 'Username already exist'});
+          res.redirect("/register");
           return console.log(err);
         });
       }
     })
     .catch((err) => {
-      res.json({status: 'success', message: 'Username already exist'});
-      // res.render("pages/register", {
-      //   error: true,
-      //   message: err.message,
-      // });
+      //res.json({status: 'success', message: 'Username already exist'});
+      res.render("pages/register", {
+        error: true,
+        message: err.message,
+      });
       return console.log(err);
     });
 });
