@@ -141,12 +141,11 @@ app.post('/register', async (req, res) => {
       }
     })
     .catch((err) => {
-      // res.json({status: 'success', message: 'Username already exist'});
-      console.log("hi)");
-      res.render("pages/register", {
-        error: true,
-        message: err.message,
-      });
+      res.json({status: 'success', message: 'Username already exist'});
+      // res.render("pages/register", {
+      //   error: true,
+      //   message: err.message,
+      // });
       return console.log(err);
     });
 });
@@ -251,13 +250,13 @@ app.get('/profile', (req, res) => {
 
   db.any(query, [user.user_id])
     .then((user_data) => {
-      const query = `select * from past_trips 
+      const query = `select distinct * from past_trips 
                        left join user_to_trips
                        on past_trips.trip_id = user_to_trips.trip_id
                        where user_to_trips.user_id = $1;`;
       db.any(query, [user.user_id])
         .then((trip_data) => {
-          console.log(trip_data);
+          // console.log(trip_data);
           const query = `select * from products 
                             left join user_to_products
                             on products.product_id = user_to_products.product_id
@@ -363,6 +362,7 @@ app.get("/resort", (req, res) => {
   const tripAdd = req.query.added;
   const resortQuery = `SELECT * FROM trips WHERE trip_name = $1;`;
   var message = "";
+  var error = false;
 
   if(tripAdd == "success")
   {
@@ -371,6 +371,7 @@ app.get("/resort", (req, res) => {
   else if(tripAdd == "failed")
   {
     message = "There was a problem adding your trip, please try again";
+    error = true;
   }
 
   // Gets all of the data from the trips table for the specific resort
@@ -379,7 +380,8 @@ app.get("/resort", (req, res) => {
       res.render("pages/resort", {
         status: 201,
         data: data,
-        message: message
+        message: message,
+        error: error
       });
     })
     .catch(function (err) {
@@ -399,50 +401,40 @@ app.post("/resort/add", async (req, res) => {
 
   // Queries
   const tripIdQuery = `SELECT trip_id FROM trips WHERE trip_name = $1;`;
-  const queryPastTrips = `INSERT INTO past_trips(trip_id, link, location, duration) VALUES ($1, $2, $3, $4) returning *;`;
-  const queryUserToTrips = `INSERT INTO user_to_trips(user_id, trip_id) VALUES ($1, $2) returning *;`;
+  const pastTripsInsertQuery = `INSERT INTO past_trips(trip_id, link, location, duration) VALUES ($1, $2, $3, $4);`;
+  const userToTripsQuery = `INSERT INTO user_to_trips(user_id, trip_id) VALUES ($1, $2);`;
 
-  // Gets the trip_id
+  // Get the trip_id
   db.any(tripIdQuery, [resortName])
-    .then(function (data) {
+  .then(function (trips) {
 
-      const trip_id = data[0]["trip_id"];
+    const trip_id = trips[0]["trip_id"];
 
-      // Inserts into past trips table
-      db.one(queryPastTrips, [trip_id, link, resortName, duration])
-        .then(function (data) {
-          // Find user in user's table
-          db.any(`SELECT user_id FROM users WHERE user_id = ${user.user_id}`)
-            .then(function (data) {
+    // Insert into past_trips
+    db.any(pastTripsInsertQuery, [trip_id, link, resortName, duration])
+    .then(function (pastTrips) {
 
-              const user_id = data[0]["user_id"];
+      // Insert into user_to_trips
+      db.any(userToTripsQuery, [user.user_id, trip_id])
+      .then(function(data){
+        res.redirect(`/resort?trip_name=${resortName}&added=success`);
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.redirect(`/resort?trip_name=${resortName}&added=failed`);
+      });
 
-              // Connects past trips to the user's account
-              db.one(queryUserToTrips, [user_id, trip_id])
-                .then(function (data) {
-                  res.redirect(`/resort?trip_name=${resortName}&added=success`);
-                })
-                .catch(function (err) {
-                  console.log(err);
-                  res.redirect(`/resort?trip_name=${resortName}&added=failed`);
-                });
-            })
-            .catch(function (err) {
-              console.log(err);
-              // Re-renders the page 
-              res.redirect(`/resort?trip_name=${resortName}&added=failed`);
-            });
-        })
-        .catch(function (err) {
-          console.log(err);
-          // Re-renders the page 
-          res.redirect(`/resort?trip_name=${resortName}&added=failed`);
-        });
     })
     .catch(function (err) {
       console.log(err);
       res.redirect(`/resort?trip_name=${resortName}&added=failed`);
     });
+    
+  })
+  .catch(function (err) {
+    console.log(err);
+    res.redirect(`/resort?trip_name=${resortName}&added=failed`);
+  });
 
 });
 
