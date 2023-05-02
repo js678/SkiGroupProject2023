@@ -32,3 +32,13 @@ Ask TA about test cases tomorrow
 Will make doc for project report
 Will work on presentation over the weekend
 Most things are finishing up and it’s just aesthetic changes and testing that needs to get done
+
+5/1/2023:
+Finished all pages
+Fixed login/register bug 
+Fixed authentication
+Changed css styling 
+Found past trips bug 
+Worked on test cases
+Scheduled TA meeting for tomorrow at 5pm 
+Work on presentation for Wednesday

@@ -40,3 +40,18 @@ Then move on to styling and making new branches
 Make sure everything is functional before styling and presentation and reports
 Meeting with TA on Monday or Tuesday to go over presentation and last minute details
 Reach out to TA over email about times that would work for the next meeting
+
+5/2/2023:
+Go over the project presentation
+Can add APIs and other things used in the tools section
+Add enhancements and other functionalities that you would add if you add time
+If deploying project before presentation, add a QR code so that people can look at it while you're presenting
+Introduce yourselves
+Know who is presenting and be prepared
+Practice a couple of times
+Divide slides equally between ourselves
+Can do a local host, but can deploy before presentation
+In the same room as the recitation
+Will be with all of the TA's and the professor
+For the login/register pages, can remove the searchbar from the navbar
+Can share the presentation with TA so that she can look at it
